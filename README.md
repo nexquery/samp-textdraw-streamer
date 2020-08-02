@@ -1,3 +1,5 @@
+[![GitHub Release](https://img.shields.io/github/release/BenBurak/Textdraw-Streamer.svg)](https://github.com/BenBurak/Textdraw-Streamer/releases/latest) [![Download](https://img.shields.io/github/downloads/BenBurak/Textdraw-Streamer/total?color=blue)](https://github.com/BenBurak/Textdraw-Streamer/releases/latest) [![License](https://img.shields.io/github/license/BenBurak/Textdraw-Streamer?color=blue)](https://github.com/BenBurak/Textdraw-Streamer)
+
 ### Textdraw Streamer
 This plugin removes the PlayerTextdraw limit. All you have to do is install the plugin.
 
