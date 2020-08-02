@@ -65,7 +65,6 @@ cell AMX_NATIVE_CALL Natives::CreatePTextdraw(AMX* amx, cell* params)
 	}
 
 	Item::pText[playerid].insert(std::make_pair(id, std::move(pt)));
-	SlotManager::Add_ID(playerid, id);
 
 	return static_cast<cell>(id);
 }
