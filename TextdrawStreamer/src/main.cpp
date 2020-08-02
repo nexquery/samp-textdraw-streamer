@@ -24,7 +24,7 @@ std::set<AMX*> global_Amx;
 
 PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports()
 {
-	return sampgdk::Supports() | SUPPORTS_VERSION | SUPPORTS_AMX_NATIVES | SUPPORTS_PROCESS_TICK;
+	return sampgdk::Supports() | SUPPORTS_VERSION | SUPPORTS_AMX_NATIVES;
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL Load(void** ppData)
@@ -132,6 +132,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int tex
 							amx_Exec(*j, NULL, idx);
 						}
 					}
+					break;
 				}
 			}
 		}
