@@ -24,8 +24,6 @@ class SlotManager
 
 		static size_t Free_ID(size_t playerid);
 
-		static void Add_ID(size_t playerid, size_t id);
-
 		static void Remove_ID(size_t playerid, size_t id);
 
 		static void Reset_ID(size_t playerid);
@@ -33,5 +31,7 @@ class SlotManager
 		static void Reset_All_ID();
 
 	private:
-		static std::map<int, std::vector<int>> Slot;
+		static std::map<int, std::priority_queue<size_t, std::vector<size_t>, std::greater<size_t>>> Slot;
+		static std::map<int, size_t> Slot_Counter;
+		static const size_t Start_ID = 1;
 };
