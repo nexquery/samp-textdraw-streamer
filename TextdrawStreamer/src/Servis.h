@@ -20,5 +20,8 @@
 
 namespace Servis
 {
-	std::string Get_String(AMX* amx, cell params);
+	std::string Get_String(AMX* amx, cell input);
+	void Native_String(AMX* amx, cell output, cell size, std::string string);
+	void Native_SetFloat(AMX* amx, cell output, float value);
+	void Native_SetInt(AMX* amx, cell output, int value);
 };
