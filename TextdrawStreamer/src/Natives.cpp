@@ -16,6 +16,8 @@
 
 #include "Natives.h"
 
+#pragma region OLUSTURMA
+
 cell AMX_NATIVE_CALL Natives::CreatePTextdraw(AMX* amx, cell* params)
 {
 	size_t playerid = static_cast<size_t>(params[1]);
@@ -100,6 +102,7 @@ cell AMX_NATIVE_CALL Natives::PTextLetterSize(AMX* amx, cell* params)
 	size_t playerid = static_cast<size_t>(params[1]);
 	if (!Item::pText[playerid].empty())
 	{
+		// Verileri çek
 		size_t text_id = static_cast<size_t>(params[2]);
 		float x = amx_ctof(params[3]);
 		float y = amx_ctof(params[4]);
@@ -107,6 +110,7 @@ cell AMX_NATIVE_CALL Natives::PTextLetterSize(AMX* amx, cell* params)
 		std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
 		if (p != Item::pText[playerid].end())
 		{
+			// Verileri güncelle
 			p->second->lettersize_x = x;
 			p->second->lettersize_y = y;
 			if (p->second->real_id != INVALID_DYNAMIC_TEXTDRAW)
@@ -670,3 +674,285 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewVehCol(AMX* amx, cell* params)
 	}
 	return 1;
 }
+
+#pragma endregion
+
+#pragma region VERI OKUMA
+
+cell AMX_NATIVE_CALL Natives::IsValidPlayerTextDraw(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return 1;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::IsPlayerTextDrawVisible(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		if (p->second->real_id != INVALID_DYNAMIC_TEXTDRAW)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetString(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		if (p->second->setstring.length() != 0)
+		{
+			Servis::Native_String(amx, params[3], params[4], p->second->setstring);
+		}
+		else
+		{
+			Servis::Native_String(amx, params[3], params[4], p->second->text);
+		}
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetPos(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		if (p->second->real_id != INVALID_DYNAMIC_TEXTDRAW)
+		{
+			sampgdk_PlayerTextDrawDestroy(playerid, p->second->real_id);
+		
+			p->second->real_id = INVALID_DYNAMIC_TEXTDRAW;
+
+			p->second->create_x = amx_ctof(params[3]);
+			p->second->create_y = amx_ctof(params[4]);
+
+			AMX_NATIVE callback = sampgdk::FindNative("PTextShow");
+			if (callback != nullptr)
+			{
+				sampgdk::InvokeNative(callback, "dd", playerid, text_id);
+			}
+		}
+		else
+		{
+			p->second->create_x = amx_ctof(params[3]);
+			p->second->create_y = amx_ctof(params[4]);
+		}
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetLetterSize(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		Servis::Native_SetFloat(amx, params[3], p->second->lettersize_x);
+		Servis::Native_SetFloat(amx, params[4], p->second->lettersize_y);
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetTextSize(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		Servis::Native_SetFloat(amx, params[3], p->second->textsize_x);
+		Servis::Native_SetFloat(amx, params[4], p->second->textsize_y);
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPos(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		Servis::Native_SetFloat(amx, params[3], p->second->create_x);
+		Servis::Native_SetFloat(amx, params[4], p->second->create_y);
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetColor(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->color;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBoxColor(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->boxcolor;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBackgroundCol(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->backgroundcolor;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetShadow(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->shadow;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetOutline(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->outline;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetFont(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->font;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsBox(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->usebox;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsProportional(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->proportional;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsSelectable(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->selectable;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetAlignment(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->alignment;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewModel(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->modelindex;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewRot(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		Servis::Native_SetFloat(amx, params[3], p->second->fRotX);
+		Servis::Native_SetFloat(amx, params[4], p->second->fRotY);
+		Servis::Native_SetFloat(amx, params[5], p->second->fRotZ);
+		Servis::Native_SetFloat(amx, params[6], p->second->fZoom);
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewVehCol(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		Servis::Native_SetInt(amx, params[3], p->second->veh_col1);
+		Servis::Native_SetInt(amx, params[4], p->second->veh_col2);
+	}
+	return 1;
+}
+
+#pragma endregion
