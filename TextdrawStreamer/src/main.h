@@ -16,4 +16,4 @@
 
 #pragma once
 
-constexpr auto PLUGIN_VERSION = "1.0.5";
+constexpr auto PLUGIN_VERSION = "1.0.6";
