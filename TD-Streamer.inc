@@ -45,8 +45,32 @@ native PTextPreviewModel(playerid, PlayerText: text, modelindex);
 native PTextPreviewRot(playerid, PlayerText: text, Float: fRotX, Float: fRotY, Float: fRotZ, Float: fZoom = 1.0);
 native PTextPreviewVehCol(playerid, PlayerText: text, color1, color2);
 
+// YSF Functions
+native IsValidPlayerTextDraw(playerid, PlayerText: text);
+native IsPlayerTextDrawVisible(playerid, PlayerText: text);
+native PlayerTextDrawGetString(playerid, PlayerText: text, pTextString[], len = sizeof(pTextString));
+native PlayerTextDrawSetPos(playerid, PlayerText: text, Float:fX, Float:fY);
+native PlayerTextDrawGetLetterSize(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
+native PlayerTextDrawGetTextSize(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
+native PlayerTextDrawGetPos(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
+native PlayerTextDrawGetColor(playerid, PlayerText: text);
+native PlayerTextDrawGetBoxColor(playerid, PlayerText: text);
+native PlayerTextDrawGetBackgroundCol(playerid, PlayerText: text);
+native PlayerTextDrawGetShadow(playerid, PlayerText: text);
+native PlayerTextDrawGetOutline(playerid, PlayerText: text);
+native PlayerTextDrawGetFont(playerid, PlayerText: text);
+native PlayerTextDrawIsBox(playerid, PlayerText: text);
+native PlayerTextDrawIsProportional(playerid, PlayerText: text);
+native PlayerTextDrawIsSelectable(playerid, PlayerText: text);
+native PlayerTextDrawGetAlignment(playerid, PlayerText: text);
+native PlayerTextDrawGetPreviewModel(playerid, PlayerText: text);
+native PlayerTextDrawGetPreviewRot(playerid, PlayerText: text, &Float:fRotX, &Float:fRotY = 0.0, &Float:fRotZ = 0.0, &Float:fZoom = 0.0);
+native PlayerTextDrawGetPreviewVehCol(playerid, PlayerText: text, &color1, &color2 = 0);
+
 // Callback
 forward ClickDynamicPlayerTextdraw(playerid, PlayerText: playertextid);
+forward OnPlayerClickDynamicTextdraw(playerid, PlayerText: playertextid);
+forward OnDynamicPlayerTextdrawClicked(playerid, PlayerText: playertextid);
 
 // Modification
 stock DYN_DestroyPTextdraw(playerid, &PlayerText: text)
