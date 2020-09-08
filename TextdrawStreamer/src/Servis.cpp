@@ -16,15 +16,30 @@
 
 #include "Servis.h"
 
-std::string Servis::Get_String(AMX* amx, cell params)
+std::string Servis::Get_String(AMX* amx, cell input)
 {
-	int len;
-	cell* adres;
-	amx_GetAddr(amx, params, &adres);
-	amx_StrLen(adres, &len);
-	char* sz = new char[len + 1];
-	amx_GetString(sz, adres, 0, len + 1);
-	std::string str = sz;
-	delete[] sz;
-	return str;
+	char* string = NULL;
+	amx_StrParam(amx, input, string);
+	return string ? string : "";
+}
+
+void Servis::Native_String(AMX* amx, cell output, cell size, std::string string)
+{
+	cell* address = NULL;
+	amx_GetAddr(amx, output, &address);
+	amx_SetString(address, string.c_str(), 0, 0, static_cast<size_t>(size));
+}
+
+void Servis::Native_SetFloat(AMX* amx, cell output, float value)
+{
+	cell* address;
+	amx_GetAddr(amx, output, &address);
+	*address = amx_ftoc(value);
+}
+
+void Servis::Native_SetInt(AMX* amx, cell output, int value)
+{
+	cell* address;
+	amx_GetAddr(amx, output, &address);
+	*address = value;
 }
