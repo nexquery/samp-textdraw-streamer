@@ -88,8 +88,29 @@ vector<AMX_NATIVE_INFO> Nativeler
 	{ "PTextSetString", Natives::PTextSetString},
 	{ "PTextPreviewModel", Natives::PTextPreviewModel},
 	{ "PTextPreviewRot", Natives::PTextPreviewRot},
-	{ "PTextPreviewVehCol", Natives::PTextPreviewVehCol}
+	{ "PTextPreviewVehCol", Natives::PTextPreviewVehCol},
 
+	// Veri Okuma
+	{ "IsValidPlayerTextDraw", Natives::IsValidPlayerTextDraw},
+	{ "IsPlayerTextDrawVisible", Natives::IsPlayerTextDrawVisible},
+	{ "PlayerTextDrawGetString", Natives::PlayerTextDrawGetString},
+	{ "PlayerTextDrawSetPos", Natives::PlayerTextDrawSetPos},
+	{ "PlayerTextDrawGetLetterSize", Natives::PlayerTextDrawGetLetterSize},
+	{ "PlayerTextDrawGetTextSize", Natives::PlayerTextDrawGetTextSize},
+	{ "PlayerTextDrawGetPos", Natives::PlayerTextDrawGetPos},
+	{ "PlayerTextDrawGetColor", Natives::PlayerTextDrawGetColor},
+	{ "PlayerTextDrawGetBoxColor", Natives::PlayerTextDrawGetBoxColor},
+	{ "PlayerTextDrawGetBackgroundCol", Natives::PlayerTextDrawGetBackgroundCol},
+	{ "PlayerTextDrawGetShadow", Natives::PlayerTextDrawGetShadow},
+	{ "PlayerTextDrawGetOutline", Natives::PlayerTextDrawGetOutline},
+	{ "PlayerTextDrawGetFont", Natives::PlayerTextDrawGetFont},
+	{ "PlayerTextDrawIsBox", Natives::PlayerTextDrawIsBox},
+	{ "PlayerTextDrawIsProportional", Natives::PlayerTextDrawIsProportional},
+	{ "PlayerTextDrawIsSelectable", Natives::PlayerTextDrawIsSelectable},
+	{ "PlayerTextDrawGetAlignment", Natives::PlayerTextDrawGetAlignment},
+	{ "PlayerTextDrawGetPreviewModel", Natives::PlayerTextDrawGetPreviewModel},
+	{ "PlayerTextDrawGetPreviewRot", Natives::PlayerTextDrawGetPreviewRot},
+	{ "PlayerTextDrawGetPreviewVehCol", Natives::PlayerTextDrawGetPreviewVehCol}
 };
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX* amx)
@@ -125,7 +146,24 @@ PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int tex
 					int idx;
 					for (std::set<AMX*>::iterator j = global_Amx.begin(); j != global_Amx.end(); j++)
 					{
+						// Default
 						if (!amx_FindPublic(*j, "ClickDynamicPlayerTextdraw", &idx))
+						{
+							amx_Push(*j, p->first);
+							amx_Push(*j, playerid);
+							amx_Exec(*j, NULL, idx);
+						}
+
+						// Name suggestion: Fairuz
+						if (!amx_FindPublic(*j, "OnPlayerClickDynamicTextdraw", &idx))
+						{
+							amx_Push(*j, p->first);
+							amx_Push(*j, playerid);
+							amx_Exec(*j, NULL, idx);
+						}
+
+						// Name suggestion: Kursed
+						if (!amx_FindPublic(*j, "OnDynamicPlayerTextdrawClicked", &idx))
 						{
 							amx_Push(*j, p->first);
 							amx_Push(*j, playerid);
