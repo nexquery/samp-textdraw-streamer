@@ -46,4 +46,26 @@ public:
 	static cell AMX_NATIVE_CALL PTextPreviewModel(AMX* amx, cell* params);
 	static cell AMX_NATIVE_CALL PTextPreviewRot(AMX* amx, cell* params);
 	static cell AMX_NATIVE_CALL PTextPreviewVehCol(AMX* amx, cell* params);
+
+	// Player Textdraw Verilerini Okuma
+	static cell AMX_NATIVE_CALL IsValidPlayerTextDraw(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL IsPlayerTextDrawVisible(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetString(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawSetPos(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetLetterSize(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetTextSize(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetPos(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetColor(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetBoxColor(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetBackgroundCol(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetShadow(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetOutline(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetFont(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawIsBox(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawIsProportional(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawIsSelectable(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetAlignment(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewModel(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewRot(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewVehCol(AMX* amx, cell* params);
 };
