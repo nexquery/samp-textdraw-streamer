@@ -19,10 +19,6 @@
 #endif
 #define _SCRIPT_UNLIMITED_TEXTDRAW_
 
-
-// Definitions
-#define	INVALID_DYNAMIC_TEXTDRAW (PlayerText: -1)
-
 // Native
 native PlayerText: CreatePTextdraw(playerid, Float: x, Float: y, const text[]);
 native DestroyPTextdraw(playerid, PlayerText: text);
@@ -72,155 +68,144 @@ forward ClickDynamicPlayerTextdraw(playerid, PlayerText: playertextid);
 forward OnPlayerClickDynamicTextdraw(playerid, PlayerText: playertextid);
 forward OnDynamicPlayerTextdrawClicked(playerid, PlayerText: playertextid);
 
-// Modification
-stock DYN_DestroyPTextdraw(playerid, &PlayerText: text)
-{
-	if(text != INVALID_DYNAMIC_TEXTDRAW)
-	{
-		DestroyPTextdraw(playerid, text);
-		text = INVALID_DYNAMIC_TEXTDRAW;
-	}
-	return 1;
-}
-
 /*******************************************************************************/
 #if defined _ALS_CreatePlayerTextDraw
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef CreatePlayerTextDraw
 #else
-    #define _ALS_CreatePlayerTextDraw
+	#define _ALS_CreatePlayerTextDraw
 #endif
 #define CreatePlayerTextDraw CreatePTextdraw
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawDestroy
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawDestroy
 #else
-    #define _ALS_PlayerTextDrawDestroy
+	#define _ALS_PlayerTextDrawDestroy
 #endif
-#define PlayerTextDrawDestroy DYN_DestroyPTextdraw
+#define PlayerTextDrawDestroy DestroyPTextdraw
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawLetterSize
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawLetterSize
 #else
-    #define _ALS_PlayerTextDrawLetterSize
+	#define _ALS_PlayerTextDrawLetterSize
 #endif
 #define PlayerTextDrawLetterSize PTextLetterSize
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawTextSize
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawTextSize
 #else
-    #define _ALS_PlayerTextDrawTextSize
+	#define _ALS_PlayerTextDrawTextSize
 #endif
 #define PlayerTextDrawTextSize PTextSize
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawAlignment
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawAlignment
 #else
-    #define _ALS_PlayerTextDrawAlignment
+	#define _ALS_PlayerTextDrawAlignment
 #endif
 #define PlayerTextDrawAlignment PTextAlignment
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawColor
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawColor
 #else
-    #define _ALS_PlayerTextDrawColor
+	#define _ALS_PlayerTextDrawColor
 #endif
 #define PlayerTextDrawColor PTextColor
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawUseBox
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawUseBox
 #else
-    #define _ALS_PlayerTextDrawUseBox
+	#define _ALS_PlayerTextDrawUseBox
 #endif
 #define PlayerTextDrawUseBox PTextUseBox
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawBoxColor
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawBoxColor
 #else
-    #define _ALS_PlayerTextDrawBoxColor
+	#define _ALS_PlayerTextDrawBoxColor
 #endif
 #define PlayerTextDrawBoxColor PTextBoxColor
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetShadow
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawSetShadow
 #else
-    #define _ALS_PlayerTextDrawSetShadow
+	#define _ALS_PlayerTextDrawSetShadow
 #endif
 #define PlayerTextDrawSetShadow PTextShadow
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetOutline
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawSetOutline
 #else
-    #define _ALS_PlayerTextDrawSetOutline
+	#define _ALS_PlayerTextDrawSetOutline
 #endif
 #define PlayerTextDrawSetOutline PTextOutline
 /*******************************************************************************/
-#if defined _ALS_PTextBgColor
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawBackgroundCo
+	#undef PlayerTextDrawBackgroundColor
 #else
-    #define _ALS_PTextBgColor
+	#define _ALS_PlayerTextDrawBackgroundCo
 #endif
 #define PlayerTextDrawBackgroundColor PTextBGColor
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawFont
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawFont
 #else
-    #define _ALS_PlayerTextDrawFont
+	#define _ALS_PlayerTextDrawFont
 #endif
 #define PlayerTextDrawFont PTextFont
 /*******************************************************************************/
-#if defined _ALS_PTextDrawSetProportional
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawSetProportio
+	#undef PlayerTextDrawSetProportional
 #else
-    #define _ALS_PTextDrawSetProportional
+	#define _ALS_PlayerTextDrawSetProportio
 #endif
 #define PlayerTextDrawSetProportional PTextProportional
 /*******************************************************************************/
-#if defined _ALS_PTextDrawSetSelectable
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawSetSelectabl
+	#undef PlayerTextDrawSetSelectable
 #else
-    #define _ALS_PTextDrawSetSelectable
+	#define _ALS_PlayerTextDrawSetSelectabl
 #endif
 #define PlayerTextDrawSetSelectable PTextSelectable
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawShow
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawShow
 #else
-    #define _ALS_PlayerTextDrawShow
+	#define _ALS_PlayerTextDrawShow
 #endif
 #define PlayerTextDrawShow PTextShow
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawHide
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawHide
 #else
-    #define _ALS_PlayerTextDrawHide
+	#define _ALS_PlayerTextDrawHide
 #endif
 #define PlayerTextDrawHide PTextHide
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetString
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+	#undef PlayerTextDrawSetString
 #else
-    #define _ALS_PlayerTextDrawSetString
+	#define _ALS_PlayerTextDrawSetString
 #endif
 #define PlayerTextDrawSetString PTextSetString
 /*******************************************************************************/
-#if defined _ALS_PTextDrawSetPreviewModel
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawSetPreviewMo
+	#undef PlayerTextDrawSetPreviewModel
 #else
-    #define _ALS_PTextDrawSetPreviewModel
+	#define _ALS_PlayerTextDrawSetPreviewMo
 #endif
 #define PlayerTextDrawSetPreviewModel PTextPreviewModel
 /*******************************************************************************/
-#if defined _ALS_PTextDrawSetPreviewRot
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawSetPreviewRo
+	#undef PlayerTextDrawSetPreviewRot
 #else
-    #define _ALS_PTextDrawSetPreviewRot
+	#define _ALS_PlayerTextDrawSetPreviewRo
 #endif
 #define PlayerTextDrawSetPreviewRot PTextPreviewRot
 /*******************************************************************************/
-#if defined _ALS_PTextDrawSetPreviewVehCol
-    #error Textdraw Streamer kutuphanesini ilk siralara yerlestirin.
+#if defined _ALS_PlayerTextDrawSetPreviewVe
+	#undef PlayerTextDrawSetPreviewVehCol
 #else
-    #define _ALS_PTextDrawSetPreviewVehCol
+	#define _ALS_PlayerTextDrawSetPreviewVe
 #endif
 #define PlayerTextDrawSetPreviewVehCol PTextPreviewVehCol
 /*******************************************************************************/
