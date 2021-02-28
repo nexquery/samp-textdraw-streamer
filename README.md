@@ -19,10 +19,32 @@ _Example:_
 
 other libraries...
 ```
-Then all you have to do is change the name OnPlayerClickPlayerTextDraw to ClickDynamicPlayerTextdraw.
+
+### If You Are Using Weapon Config
+
+_Example:_
+```c++
+#include <a_samp>
+#include <weapon-config>
+#include <TD-Streamer>
+
+other libraries...
+```
+
+Then all you have to do is use one of the following callbacks.
 
 ```c++
 public ClickDynamicPlayerTextdraw(playerid, PlayerText: playertextid)
+{
+	return 0;
+}
+
+public OnPlayerClickDynamicTextdraw(playerid, PlayerText: playertextid)
+{
+	return 0;
+}
+
+public OnDynamicPlayerTextdrawClicked(playerid, PlayerText: playertextid)
 {
 	return 0;
 }
