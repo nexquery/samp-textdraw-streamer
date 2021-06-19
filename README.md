@@ -49,3 +49,11 @@ public OnDynamicPlayerTextdrawClicked(playerid, PlayerText: playertextid)
 	return 0;
 }
 ```
+
+### How can I compile the plugin?
+```
+cd src
+mkdir build && cd build
+cmake ../ -DCMAKE_BUILD_TYPE=Release
+make
+```
