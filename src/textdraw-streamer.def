@@ -1,0 +1,6 @@
+EXPORTS
+	Supports
+	Load
+	Unload
+	OnPlayerDisconnect
+	OnPlayerClickPlayerTextDraw
