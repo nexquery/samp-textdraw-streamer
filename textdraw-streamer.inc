@@ -63,6 +63,14 @@ native PlayerTextDrawGetPreviewModel(playerid, PlayerText: text);
 native PlayerTextDrawGetPreviewRot(playerid, PlayerText: text, &Float:fRotX, &Float:fRotY = 0.0, &Float:fRotZ = 0.0, &Float:fZoom = 0.0);
 native PlayerTextDrawGetPreviewVehCol(playerid, PlayerText: text, &color1, &color2 = 0);
 
+// Extra ID
+native PlayerTextDrawSetExtraID(playerid, PlayerText: text, index, value);
+native PlayerTextDrawGetExtraID(playerid, PlayerText: text, index);
+native PlayerTextDrawResetExtraID(playerid, PlayerText: text);
+
+// Other
+native PlayerTextDrawTotalCreate(playerid);
+
 // Callback
 forward ClickDynamicPlayerTextdraw(playerid, PlayerText: playertextid);
 forward OnPlayerClickDynamicTextdraw(playerid, PlayerText: playertextid);
