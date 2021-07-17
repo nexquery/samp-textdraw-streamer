@@ -16,15 +16,23 @@ include_directories(
 add_definitions(-DSAMPGDK_AMALGAMATION)
 
 add_samp_plugin(textdraw-streamer
-  amxplugin.cpp
-  Item.cpp
-  Natives.cpp
-  precompiler.cpp
-  Servis.cpp
-  SlotManager.cpp
-  Makro.h
-  main.cpp
-  textdraw-streamer.def
-  sampgdk.c
-  sampgdk.h
+	amxplugin.cpp
+	Item.cpp
+	Item.h
+	main.cpp
+	main.h
+	Makro.h
+	Natives.cpp
+	Natives.h
+	plugin.h
+	plugincommon.h
+	precompiler.cpp
+	precompiler.h
+	sampgdk.c
+	sampgdk.h
+	Servis.cpp
+	Servis.h
+	SlotManager.cpp
+	SlotManager.h
+	textdraw-streamer.def
 )

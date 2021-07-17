@@ -61,6 +61,8 @@ cell AMX_NATIVE_CALL Natives::CreatePTextdraw(AMX* amx, cell* params)
 	pt->veh_col1 = -2;
 	pt->veh_col2 = -2;
 
+	pt->extra_id.clear();
+
 	if (LOG_MODE)
 	{
 		sampgdk::logprintf("%s pCreate: X: %f, Y: %f, Text: %s", LOG, pt->create_x, pt->create_y, pt->text.c_str());
@@ -89,6 +91,8 @@ cell AMX_NATIVE_CALL Natives::DestroyPTextdraw(AMX* amx, cell* params)
 			{
 				sampgdk_PlayerTextDrawDestroy(playerid, p->second->real_id);
 			}
+
+			p->second->extra_id.clear();
 
 			SlotManager::Remove_ID(playerid, text_id);
 			Item::pText[playerid].erase(p);
@@ -956,3 +960,55 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewVehCol(AMX* amx, cell* par
 }
 
 #pragma endregion
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetExtraID(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+
+	int index = static_cast<size_t>(params[3]);
+	int value = static_cast<size_t>(params[4]);
+
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		p->second->extra_id[index] = value;
+	}
+	return 1;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetExtraID(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	int index = static_cast<size_t>(params[3]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		return p->second->extra_id[index];
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawResetExtraID(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	size_t text_id = static_cast<size_t>(params[2]);
+	std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].find(text_id);
+	if (p != Item::pText[playerid].end())
+	{
+		p->second->extra_id.clear();
+		return 1;
+	}
+	return 0;
+}
+
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawTotalCreate(AMX* amx, cell* params)
+{
+	size_t playerid = static_cast<size_t>(params[1]);
+	if (Item::pText[playerid].empty())
+	{
+		return 0;
+	}
+	return Item::pText[playerid].size();
+}

@@ -3,6 +3,6 @@ EXPORTS
 	Load
 	Unload
 	AmxLoad
-    	AmxUnload
+    AmxUnload
 	OnPlayerDisconnect
 	OnPlayerClickPlayerTextDraw

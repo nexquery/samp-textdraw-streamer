@@ -68,4 +68,12 @@ public:
 	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewModel(AMX* amx, cell* params);
 	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewRot(AMX* amx, cell* params);
 	static cell AMX_NATIVE_CALL PlayerTextDrawGetPreviewVehCol(AMX* amx, cell* params);
+
+	// Extra ID
+	static cell AMX_NATIVE_CALL PlayerTextDrawSetExtraID(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawGetExtraID(AMX* amx, cell* params);
+	static cell AMX_NATIVE_CALL PlayerTextDrawResetExtraID(AMX* amx, cell* params);
+
+	// Diger
+	static cell AMX_NATIVE_CALL PlayerTextDrawTotalCreate(AMX* amx, cell* params);
 };

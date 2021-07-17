@@ -85,6 +85,8 @@ struct PlayerText
 
 	int veh_col1;
 	int veh_col2;
+
+	std::map<int, int> extra_id;
 };
 
 class Item

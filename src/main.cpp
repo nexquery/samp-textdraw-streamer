@@ -111,6 +111,14 @@ AMX_NATIVE_INFO Nativeler[] =
 	{ "PlayerTextDrawGetPreviewRot", Natives::PlayerTextDrawGetPreviewRot},
 	{ "PlayerTextDrawGetPreviewVehCol", Natives::PlayerTextDrawGetPreviewVehCol},
 
+	// Extra ID
+	{ "PlayerTextDrawSetExtraID", Natives::PlayerTextDrawSetExtraID},
+	{ "PlayerTextDrawGetExtraID", Natives::PlayerTextDrawGetExtraID},
+	{ "PlayerTextDrawResetExtraID", Natives::PlayerTextDrawResetExtraID},
+
+	// Diger
+	{ "PlayerTextDrawTotalCreate", Natives::PlayerTextDrawTotalCreate},
+
 	// Null
 	{ 0, 0 }
 };
@@ -130,6 +138,10 @@ PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX* amx)
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerDisconnect(int playerid, int reason)
 {
 	SlotManager::Reset_ID(playerid);
+	for (std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].begin(); p != Item::pText[playerid].end(); p++)
+	{
+		p->second->extra_id.clear();
+	}
 	Item::pText[playerid].clear();
 	return true;
 }
