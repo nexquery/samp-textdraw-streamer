@@ -10,7 +10,7 @@ This add-on is designed to avoid pawn loads. It is as fast as possible because i
 As a result of the tests I have done, I have not encountered a bug. If you find an error, feel free to report it.
 
 ### Setup
-Simply add the TD-Streamer library to the very beginning of the game mode you are using.
+Simply add the textdraw-streamer library to the very beginning of the game mode you are using.
 
 _Example:_
 ```c++
