@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Burak (NexoR)
+ * Copyright (C) 2023 Burak (Nexor)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,179 +14,176 @@
  * limitations under the License.
  */
 
-#include "precompiler.h"
-#include "Natives.h"
-#include "main.h"
+#include <set>
+#include "sampgdk.h"
+#include "compilation_date.hpp"
+#include "plugin_version.hpp"
+#include "slot_manager.hpp"
+#include "natives.hpp"
+#include "player_textdraw.hpp"
 
-std::set<AMX*> global_Amx;
+bool load = false;
+extern void *pAMXFunctions;
+std::set<AMX*> gAmx;
 
-extern void* pAMXFunctions;
-
-PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports()
+PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports() 
 {
-	return sampgdk::Supports() | SUPPORTS_VERSION | SUPPORTS_AMX_NATIVES;
+	return sampgdk::Supports() | SUPPORTS_AMX_NATIVES | SUPPORTS_PROCESS_TICK;
 }
 
-PLUGIN_EXPORT bool PLUGIN_CALL Load(void** ppData)
+PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 {
-	SlotManager::Reset_All_ID();
-	Item::Reset();
 	pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
-	bool load = sampgdk::Load(ppData);
-	sampgdk::logprintf("");
-	sampgdk::logprintf(" ===============================");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("    Textdraw Streamer Yuklendi  ");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("          Surum: %s            ", PLUGIN_VERSION);
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("    Developer: Burak (NexoR)    ");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf(" ===============================");
-	sampgdk::logprintf("");
+	load = sampgdk::Load(ppData);
+	if (load)
+	{
+		sampgdk::logprintf("");
+		sampgdk::logprintf(" =================================");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |    textdraw-streamer v%d.%d.%d   |", MINOR, MAJOR, PATCH);
+		sampgdk::logprintf(" |            Loaded             |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Coding:                      |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Burak (Nexor)                |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Compiled:                    |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  %02d.%02d.%04d, %02d:%02d:%02d         |", BUILD_DAY, BUILD_MONTH, BUILD_YEAR, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Github:                      |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  github.com/nexquery          |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Discord:                     |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Nexor#4730                   |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" =================================");
+		sampgdk::logprintf("");
+	}
 	return load;
 }
 
 PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
-	SlotManager::Reset_All_ID();
-	Item::Reset();
-	sampgdk::logprintf("");
-	sampgdk::logprintf(" ===============================");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("   Textdraw Streamer Kapatildi  ");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("          Surum: %s            ", PLUGIN_VERSION);
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf("    Developer: Burak (NexoR)    ");
-	sampgdk::logprintf("                                ");
-	sampgdk::logprintf(" ===============================");
-	sampgdk::logprintf("");
-	sampgdk::Unload();
+	if (load)
+	{
+		PlayerText::Destroy_PlayerText(-1);
+
+		sampgdk::logprintf("");
+		sampgdk::logprintf(" =================================");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |    textdraw-streamer v%d.%d.%d   |", MINOR, MAJOR, PATCH);
+		sampgdk::logprintf(" |           Unloaded            |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Coding:                      |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Burak (Nexor)                |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Compiled:                    |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  %02d.%02d.%04d, %02d:%02d:%02d         |", BUILD_DAY, BUILD_MONTH, BUILD_YEAR, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Github:                      |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  github.com/nexquery          |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Discord:                     |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" |  Nexor#4730                   |");
+		sampgdk::logprintf(" |                               |");
+		sampgdk::logprintf(" =================================");
+		sampgdk::logprintf("");
+	}
 }
 
-AMX_NATIVE_INFO Nativeler[] =
+extern "C" const AMX_NATIVE_INFO NativeList[] =
 {
 	// Player Textdraw
-	{ "CreatePTextdraw", Natives::CreatePTextdraw },
-	{ "DestroyPTextdraw", Natives::DestroyPTextdraw},
-	{ "PTextLetterSize", Natives::PTextLetterSize},
-	{ "PTextSize", Natives::PTextSize},
-	{ "PTextAlignment", Natives::PTextAlignment},
-	{ "PTextColor", Natives::PTextColor},
-	{ "PTextUseBox", Natives::PTextUseBox},
-	{ "PTextBoxColor", Natives::PTextBoxColor},
-	{ "PTextShadow", Natives::PTextShadow},
-	{ "PTextOutline", Natives::PTextOutline},
-	{ "PTextBGColor", Natives::PTextBGColor},
-	{ "PTextFont", Natives::PTextFont},
-	{ "PTextProportional", Natives::PTextProportional},
-	{ "PTextSelectable", Natives::PTextSelectable},
-	{ "PTextShow", Natives::PTextShow},
-	{ "PTextHide", Natives::PTextHide},
-	{ "PTextSetString", Natives::PTextSetString},
-	{ "PTextPreviewModel", Natives::PTextPreviewModel},
-	{ "PTextPreviewRot", Natives::PTextPreviewRot},
-	{ "PTextPreviewVehCol", Natives::PTextPreviewVehCol},
+	{"CreatePTextDraw", Natives::CreatePTextDraw},
+	{"DestroyPTextdraw", Natives::DestroyPTextdraw},
+	{"PTextLetterSize", Natives::PTextLetterSize},
+	{"PTextSize", Natives::PTextSize},
+	{"PTextAlignment", Natives::PTextAlignment},
+	{"PTextColor", Natives::PTextColor},
+	{"PTextUseBox", Natives::PTextUseBox},
+	{"PTextBoxColor", Natives::PTextBoxColor},
+	{"PTextShadow", Natives::PTextShadow},
+	{"PTextOutline", Natives::PTextOutline},
+	{"PTextBGColor", Natives::PTextBGColor},
+	{"PTextFont", Natives::PTextFont},
+	{"PTextProportional", Natives::PTextProportional},
+	{"PTextSelectable", Natives::PTextSelectable},
+	{"PTextShow", Natives::PTextShow},
+	{"PTextHide", Natives::PTextHide},
+	{"PTextSetString", Natives::PTextSetString},
+	{"PTextPreviewModel", Natives::PTextPreviewModel},
+	{"PTextPreviewRot", Natives::PTextPreviewRot},
+	{"PTextPreviewVehCol", Natives::PTextPreviewVehCol},
+	{"IsValidPlayerTextDraw__", Natives::IsValidPlayerTextDraw__},
+	{"IsPlayerTextDrawVisible__", Natives::IsPlayerTextDrawVisible__},
+	{"PlayerTextDrawGetString__", Natives::PlayerTextDrawGetString__},
+	{"PlayerTextDrawSetPos__", Natives::PlayerTextDrawSetPos__},
+	{"PlayerTextDrawGetLetterSize__", Natives::PlayerTextDrawGetLetterSize__},
+	{"PlayerTextDrawGetTextSize__", Natives::PlayerTextDrawGetTextSize__},
+	{"PlayerTextDrawGetPos__", Natives::PlayerTextDrawGetPos__},
+	{"PlayerTextDrawGetColor__", Natives::PlayerTextDrawGetColor__},
+	{"PlayerTextDrawGetBoxColor__", Natives::PlayerTextDrawGetBoxColor__},
+	{"PlayerTextDrawGetBGColor__", Natives::PlayerTextDrawGetBGColor__},
+	{"PlayerTextDrawGetShadow__", Natives::PlayerTextDrawGetShadow__},
+	{"PlayerTextDrawGetOutline__", Natives::PlayerTextDrawGetOutline__},
+	{"PlayerTextDrawGetFont__", Natives::PlayerTextDrawGetFont__},
+	{"PlayerTextDrawIsBox__", Natives::PlayerTextDrawIsBox__},
+	{"PlayerTextDrawIsProportional__", Natives::PlayerTextDrawIsProportional__},
+	{"PlayerTextDrawIsSelectable__", Natives::PlayerTextDrawIsSelectable__},
+	{"PlayerTextDrawGetAlignment__", Natives::PlayerTextDrawGetAlignment__},
+	{"PlayerTextDrawGetPreviewModel__", Natives::PlayerTextDrawGetPreviewModel__},
+	{"PlayerTextDrawGetPreviewRot__", Natives::PlayerTextDrawGetPreviewRot__},
+	{"PlayerTextDrawGetPreviewVehCo__", Natives::PlayerTextDrawGetPreviewVehCo__},
+	{"PlayerTextDrawSetExtraID", Natives::PlayerTextDrawSetExtraID},
+	{"PlayerTextDrawGetExtraID", Natives::PlayerTextDrawGetExtraID},
+	{"PlayerTextDrawResetExtraID", Natives::PlayerTextDrawResetExtraID},
+	{"PlayerTextDrawSetArrayData", Natives::PlayerTextDrawSetArrayData},
+	{"PlayerTextDrawGetArrayData", Natives::PlayerTextDrawGetArrayData},
+	{"PlayerTextDrawRemoveArrayData", Natives::PlayerTextDrawRemoveArrayData},
+	{"PlayerTextDrawGetRealID", Natives::PlayerTextDrawGetRealID},
+	{"PlayerTextDrawSize", Natives::PlayerTextDrawSize},
 
-	// Veri Okuma
-	{ "IsValidPlayerTextDraw", Natives::IsValidPlayerTextDraw},
-	{ "IsPlayerTextDrawVisible", Natives::IsPlayerTextDrawVisible},
-	{ "PlayerTextDrawGetString", Natives::PlayerTextDrawGetString},
-	{ "PlayerTextDrawSetPos", Natives::PlayerTextDrawSetPos},
-	{ "PlayerTextDrawGetLetterSize", Natives::PlayerTextDrawGetLetterSize},
-	{ "PlayerTextDrawGetTextSize", Natives::PlayerTextDrawGetTextSize},
-	{ "PlayerTextDrawGetPos", Natives::PlayerTextDrawGetPos},
-	{ "PlayerTextDrawGetColor", Natives::PlayerTextDrawGetColor},
-	{ "PlayerTextDrawGetBoxColor", Natives::PlayerTextDrawGetBoxColor},
-	{ "PlayerTextDrawGetBackgroundCol", Natives::PlayerTextDrawGetBackgroundCol},
-	{ "PlayerTextDrawGetShadow", Natives::PlayerTextDrawGetShadow},
-	{ "PlayerTextDrawGetOutline", Natives::PlayerTextDrawGetOutline},
-	{ "PlayerTextDrawGetFont", Natives::PlayerTextDrawGetFont},
-	{ "PlayerTextDrawIsBox", Natives::PlayerTextDrawIsBox},
-	{ "PlayerTextDrawIsProportional", Natives::PlayerTextDrawIsProportional},
-	{ "PlayerTextDrawIsSelectable", Natives::PlayerTextDrawIsSelectable},
-	{ "PlayerTextDrawGetAlignment", Natives::PlayerTextDrawGetAlignment},
-	{ "PlayerTextDrawGetPreviewModel", Natives::PlayerTextDrawGetPreviewModel},
-	{ "PlayerTextDrawGetPreviewRot", Natives::PlayerTextDrawGetPreviewRot},
-	{ "PlayerTextDrawGetPreviewVehCol", Natives::PlayerTextDrawGetPreviewVehCol},
-
-	// Extra ID
-	{ "PlayerTextDrawSetExtraID", Natives::PlayerTextDrawSetExtraID},
-	{ "PlayerTextDrawGetExtraID", Natives::PlayerTextDrawGetExtraID},
-	{ "PlayerTextDrawResetExtraID", Natives::PlayerTextDrawResetExtraID},
-
-	// Diger
-	{ "PlayerTextDrawTotalCreate", Natives::PlayerTextDrawTotalCreate},
-
-	// Null
-	{ 0, 0 }
+	// NULL
+	{NULL, NULL}
 };
 
-PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX* amx)
+PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX *amx)
 {
-	global_Amx.insert(amx);
-	return amx_Register(amx, Nativeler, -1);
+	gAmx.insert(amx);
+	return amx_Register(amx, NativeList, -1);
 }
 
-PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX* amx)
+PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX *amx)
 {
-	global_Amx.erase(amx);
+	gAmx.erase(amx);
 	return AMX_ERR_NONE;
+}
+
+PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
+{
+	sampgdk::ProcessTick();
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerDisconnect(int playerid, int reason)
 {
-	SlotManager::Reset_ID(playerid);
-	for (std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].begin(); p != Item::pText[playerid].end(); p++)
-	{
-		p->second->extra_id.clear();
-	}
-	Item::pText[playerid].clear();
+	// PlayerTextdraw havuzunu ve slot manageri temizle
+	PlayerText::Destroy_PlayerText(playerid);
 	return true;
 }
 
-PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int text_id)
+PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickTextDraw(int playerid, int clickedid)
 {
-	if (!Item::pText[playerid].empty())
-	{
-		if (!global_Amx.empty())
-		{
-			for (std::unordered_map<int, std::unique_ptr<PlayerText>>::iterator p = Item::pText[playerid].begin(); p != Item::pText[playerid].end(); p++)
-			{
-				if (p->second->real_id == text_id)
-				{
-					int idx;
-					for (std::set<AMX*>::iterator j = global_Amx.begin(); j != global_Amx.end(); j++)
-					{
-						// Default
-						if (!amx_FindPublic(*j, "ClickDynamicPlayerTextdraw", &idx))
-						{
-							amx_Push(*j, p->first);
-							amx_Push(*j, playerid);
-							amx_Exec(*j, NULL, idx);
-						}
+	return false;
+}
 
-						// Name suggestion: Fairuz
-						if (!amx_FindPublic(*j, "OnPlayerClickDynamicTextdraw", &idx))
-						{
-							amx_Push(*j, p->first);
-							amx_Push(*j, playerid);
-							amx_Exec(*j, NULL, idx);
-						}
-
-						// Name suggestion: Kursed
-						if (!amx_FindPublic(*j, "OnDynamicPlayerTextdrawClicked", &idx))
-						{
-							amx_Push(*j, p->first);
-							amx_Push(*j, playerid);
-							amx_Exec(*j, NULL, idx);
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
+PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int playertextid)
+{
 	return false;
 }

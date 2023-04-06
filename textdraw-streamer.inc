@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Burak (NexoR)
+ * Copyright (C) 2023 Burak (Nexor)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,67 +14,84 @@
  * limitations under the License.
  */
 
-#if defined _SCRIPT_UNLIMITED_TEXTDRAW_
+#if defined _INC_TEXTDRAW_STREAMER
 	#endinput
 #endif
-#define _SCRIPT_UNLIMITED_TEXTDRAW_
+#define _INC_TEXTDRAW_STREAMER
 
-// Native
-native PlayerText: CreatePTextdraw(playerid, Float: x, Float: y, const text[]);
-native DestroyPTextdraw(playerid, PlayerText: text);
-native PTextLetterSize(playerid, PlayerText: text, Float:x, Float:y);
-native PTextSize(playerid, PlayerText: text, Float:x, Float:y);
-native PTextAlignment(playerid, PlayerText: text, alignment);
-native PTextColor(playerid, PlayerText: text, color);
-native PTextUseBox(playerid, PlayerText: text, use);
-native PTextBoxColor(playerid, PlayerText: text, color);
-native PTextShadow(playerid, PlayerText: text, size);
-native PTextOutline(playerid, PlayerText: text, size);
-native PTextBGColor(playerid, PlayerText: text, color);
-native PTextFont(playerid, PlayerText: text, font);
-native PTextProportional(playerid, PlayerText: text, set);
-native PTextSelectable(playerid, PlayerText: text, set);
-native PTextShow(playerid, PlayerText: text);
-native PTextHide(playerid, PlayerText: text);
-native PTextSetString(playerid, PlayerText: text, const string[]);
-native PTextPreviewModel(playerid, PlayerText: text, modelindex);
-native PTextPreviewRot(playerid, PlayerText: text, Float: fRotX, Float: fRotY, Float: fRotZ, Float: fZoom = 1.0);
-native PTextPreviewVehCol(playerid, PlayerText: text, color1, color2);
+/***
+ *    8888888b.  888                                    
+ *    888   Y88b 888                                    
+ *    888    888 888                                    
+ *    888   d88P 888  8888b.  888  888  .d88b.  888d888 
+ *    8888888P"  888     "88b 888  888 d8P  Y8b 888P"   
+ *    888        888 .d888888 888  888 88888888 888     
+ *    888        888 888  888 Y88b 888 Y8b.     888     
+ *    888        888 "Y888888  "Y88888  "Y8888  888     
+ *                                 888                  
+ *                            Y8b d88P                  
+ *                             "Y88P"                   
+ */
 
-// YSF Functions
-native IsValidPlayerTextDraw(playerid, PlayerText: text);
-native IsPlayerTextDrawVisible(playerid, PlayerText: text);
-native PlayerTextDrawGetString(playerid, PlayerText: text, pTextString[], len = sizeof(pTextString));
-native PlayerTextDrawSetPos(playerid, PlayerText: text, Float:fX, Float:fY);
-native PlayerTextDrawGetLetterSize(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
-native PlayerTextDrawGetTextSize(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
-native PlayerTextDrawGetPos(playerid, PlayerText: text, &Float:fX, &Float:fY = 0.0);
-native PlayerTextDrawGetColor(playerid, PlayerText: text);
-native PlayerTextDrawGetBoxColor(playerid, PlayerText: text);
-native PlayerTextDrawGetBackgroundCol(playerid, PlayerText: text);
-native PlayerTextDrawGetShadow(playerid, PlayerText: text);
-native PlayerTextDrawGetOutline(playerid, PlayerText: text);
-native PlayerTextDrawGetFont(playerid, PlayerText: text);
-native PlayerTextDrawIsBox(playerid, PlayerText: text);
-native PlayerTextDrawIsProportional(playerid, PlayerText: text);
-native PlayerTextDrawIsSelectable(playerid, PlayerText: text);
-native PlayerTextDrawGetAlignment(playerid, PlayerText: text);
-native PlayerTextDrawGetPreviewModel(playerid, PlayerText: text);
-native PlayerTextDrawGetPreviewRot(playerid, PlayerText: text, &Float:fRotX, &Float:fRotY = 0.0, &Float:fRotZ = 0.0, &Float:fZoom = 0.0);
-native PlayerTextDrawGetPreviewVehCol(playerid, PlayerText: text, &color1, &color2 = 0);
+// General
+native PlayerText:CreatePTextDraw(playerid, Float:x, Float:y, const text[]);
+native DestroyPTextdraw(playerid, PlayerText:text);
+native PTextLetterSize(playerid, PlayerText:text, Float:x, Float:y);
+native PTextSize(playerid, PlayerText:text, Float:x, Float:y);
+native PTextAlignment(playerid, PlayerText:text, alignment);
+native PTextColor(playerid, PlayerText:text, color);
+native PTextUseBox(playerid, PlayerText:text, use);
+native PTextBoxColor(playerid, PlayerText:text, color);
+native PTextShadow(playerid, PlayerText:text, size);
+native PTextOutline(playerid, PlayerText:text, size);
+native PTextBGColor(playerid, PlayerText:text, color);
+native PTextFont(playerid, PlayerText:text, font);
+native PTextProportional(playerid, PlayerText:text, set);
+native PTextSelectable(playerid, PlayerText:text, set);
+native PTextShow(playerid, PlayerText:text);
+native PTextHide(playerid, PlayerText:text);
+native PTextSetString(playerid, PlayerText:text, const string[]);
+native PTextPreviewModel(playerid, PlayerText:text, modelindex);
+native PTextPreviewRot(playerid, PlayerText:text, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fZoom = 1.0);
+native PTextPreviewVehCol(playerid, PlayerText:text, color1, color2);
+
+// YSF Functions (names changed to avoid open.mp conflicts)
+native IsValidPlayerTextDraw__(playerid, PlayerText:text);
+native IsPlayerTextDrawVisible__(playerid, PlayerText:text);
+native PlayerTextDrawGetString__(playerid, PlayerText:text, text_string[], len = sizeof(text_string));
+native PlayerTextDrawSetPos__(playerid, PlayerText:text, Float:fX, Float:fY);
+native PlayerTextDrawGetLetterSize__(playerid, PlayerText:text, &Float:fX, &Float:fY);
+native PlayerTextDrawGetTextSize__(playerid, PlayerText:text, &Float:fX, &Float:fY);
+native PlayerTextDrawGetPos__(playerid, PlayerText:text, &Float:fX, &Float:fY);
+native PlayerTextDrawGetColor__(playerid, PlayerText:text);
+native PlayerTextDrawGetBoxColor__(playerid, PlayerText:text);
+native PlayerTextDrawGetBGColor__(playerid, PlayerText:text);
+native PlayerTextDrawGetShadow__(playerid, PlayerText:text);
+native PlayerTextDrawGetOutline__(playerid, PlayerText:text);
+native PlayerTextDrawGetFont__(playerid, PlayerText:text);
+native PlayerTextDrawIsBox__(playerid, PlayerText:text);
+native PlayerTextDrawIsProportional__(playerid, PlayerText:text);
+native PlayerTextDrawIsSelectable__(playerid, PlayerText:text);
+native PlayerTextDrawGetAlignment__(playerid, PlayerText:text);
+native PlayerTextDrawGetPreviewModel__(playerid, PlayerText:text);
+native PlayerTextDrawGetPreviewRot__(playerid, PlayerText:text, &Float:fRotX, &Float:fRotY, &Float:fRotZ, &Float:fZoom);
+native PlayerTextDrawGetPreviewVehCo__(playerid, PlayerText:text, &color1, &color2);
 
 // Extra ID
-native PlayerTextDrawSetExtraID(playerid, PlayerText: text, index, value);
-native PlayerTextDrawGetExtraID(playerid, PlayerText: text, index);
-native PlayerTextDrawResetExtraID(playerid, PlayerText: text);
+native PlayerTextDrawSetExtraID(playerid, PlayerText:text, index, value);
+native PlayerTextDrawGetExtraID(playerid, PlayerText:text, index);
+native PlayerTextDrawResetExtraID(playerid, PlayerText:text);
 
-// Other
-native PlayerTextDrawTotalCreate(playerid);
+// Array Data
+native PlayerTextDrawSetArrayData(playerid, PlayerText:text, const src[], maxsrc = sizeof(src));
+native PlayerTextDrawGetArrayData(playerid, PlayerText:text, dest[], maxdest = sizeof(dest));
+native PlayerTextDrawRemoveArrayData(playerid, PlayerText:text);
 
-// Callback
-forward ClickDynamicPlayerTextdraw(playerid, PlayerText: playertextid);
-forward OnPlayerClickDynamicTextdraw(playerid, PlayerText: playertextid);
-forward OnDynamicPlayerTextdrawClicked(playerid, PlayerText: playertextid);
+// Get the real textdraw id generated
+native PlayerTextDrawGetRealID(playerid, PlayerText:text);
+
+// Total number of textdraws created for the player
+native PlayerTextDrawSize(playerid);
 
 /*******************************************************************************/
 #if defined _ALS_CreatePlayerTextDraw

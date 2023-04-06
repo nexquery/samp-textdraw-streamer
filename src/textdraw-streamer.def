@@ -3,6 +3,8 @@ EXPORTS
 	Load
 	Unload
 	AmxLoad
-    AmxUnload
+	AmxUnload
+	ProcessTick
 	OnPlayerDisconnect
+	OnPlayerClickTextDraw
 	OnPlayerClickPlayerTextDraw
