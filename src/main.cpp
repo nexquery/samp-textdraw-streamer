@@ -15,12 +15,12 @@
  */
 
 #include <set>
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 #include "compilation_date.hpp"
 #include "plugin_version.hpp"
 #include "slot_manager.hpp"
 #include "natives.hpp"
-#include "player_textdraw.hpp"
+#include "textdraw_data.hpp"
 
 bool load = false;
 extern void *pAMXFunctions;
@@ -69,7 +69,8 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
 	if (load)
 	{
-		PlayerText::Destroy_PlayerText(-1);
+		GlobalText::Destroy();
+		PlayerText::Destroy(-1);
 
 		sampgdk::logprintf("");
 		sampgdk::logprintf(" =================================");
@@ -100,55 +101,109 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 
 extern "C" const AMX_NATIVE_INFO NativeList[] =
 {
-	// Player Textdraw
-	{"CreatePTextDraw", Natives::CreatePTextDraw},
-	{"DestroyPTextdraw", Natives::DestroyPTextdraw},
-	{"PTextLetterSize", Natives::PTextLetterSize},
-	{"PTextSize", Natives::PTextSize},
-	{"PTextAlignment", Natives::PTextAlignment},
-	{"PTextColor", Natives::PTextColor},
-	{"PTextUseBox", Natives::PTextUseBox},
-	{"PTextBoxColor", Natives::PTextBoxColor},
-	{"PTextShadow", Natives::PTextShadow},
-	{"PTextOutline", Natives::PTextOutline},
-	{"PTextBGColor", Natives::PTextBGColor},
-	{"PTextFont", Natives::PTextFont},
-	{"PTextProportional", Natives::PTextProportional},
-	{"PTextSelectable", Natives::PTextSelectable},
-	{"PTextShow", Natives::PTextShow},
-	{"PTextHide", Natives::PTextHide},
-	{"PTextSetString", Natives::PTextSetString},
-	{"PTextPreviewModel", Natives::PTextPreviewModel},
-	{"PTextPreviewRot", Natives::PTextPreviewRot},
-	{"PTextPreviewVehCol", Natives::PTextPreviewVehCol},
-	{"IsValidPlayerTextDraw__", Natives::IsValidPlayerTextDraw__},
-	{"IsPlayerTextDrawVisible__", Natives::IsPlayerTextDrawVisible__},
-	{"PlayerTextDrawGetString__", Natives::PlayerTextDrawGetString__},
-	{"PlayerTextDrawSetPos__", Natives::PlayerTextDrawSetPos__},
-	{"PlayerTextDrawGetLetterSize__", Natives::PlayerTextDrawGetLetterSize__},
-	{"PlayerTextDrawGetTextSize__", Natives::PlayerTextDrawGetTextSize__},
-	{"PlayerTextDrawGetPos__", Natives::PlayerTextDrawGetPos__},
-	{"PlayerTextDrawGetColor__", Natives::PlayerTextDrawGetColor__},
-	{"PlayerTextDrawGetBoxColor__", Natives::PlayerTextDrawGetBoxColor__},
-	{"PlayerTextDrawGetBGColor__", Natives::PlayerTextDrawGetBGColor__},
-	{"PlayerTextDrawGetShadow__", Natives::PlayerTextDrawGetShadow__},
-	{"PlayerTextDrawGetOutline__", Natives::PlayerTextDrawGetOutline__},
-	{"PlayerTextDrawGetFont__", Natives::PlayerTextDrawGetFont__},
-	{"PlayerTextDrawIsBox__", Natives::PlayerTextDrawIsBox__},
-	{"PlayerTextDrawIsProportional__", Natives::PlayerTextDrawIsProportional__},
-	{"PlayerTextDrawIsSelectable__", Natives::PlayerTextDrawIsSelectable__},
-	{"PlayerTextDrawGetAlignment__", Natives::PlayerTextDrawGetAlignment__},
-	{"PlayerTextDrawGetPreviewModel__", Natives::PlayerTextDrawGetPreviewModel__},
-	{"PlayerTextDrawGetPreviewRot__", Natives::PlayerTextDrawGetPreviewRot__},
-	{"PlayerTextDrawGetPreviewVehCo__", Natives::PlayerTextDrawGetPreviewVehCo__},
-	{"PlayerTextDrawSetExtraID", Natives::PlayerTextDrawSetExtraID},
-	{"PlayerTextDrawGetExtraID", Natives::PlayerTextDrawGetExtraID},
-	{"PlayerTextDrawResetExtraID", Natives::PlayerTextDrawResetExtraID},
-	{"PlayerTextDrawSetArrayData", Natives::PlayerTextDrawSetArrayData},
-	{"PlayerTextDrawGetArrayData", Natives::PlayerTextDrawGetArrayData},
-	{"PlayerTextDrawRemoveArrayData", Natives::PlayerTextDrawRemoveArrayData},
-	{"PlayerTextDrawGetRealID", Natives::PlayerTextDrawGetRealID},
-	{"PlayerTextDrawSize", Natives::PlayerTextDrawSize},
+	// Global
+	{"CreateDynamicTextDraw",							Natives::CreateDynamicTextDraw},
+	{"DestroyDynamicTextDraw",							Natives::DestroyDynamicTextDraw},
+	{"DynamicTextDrawLetterSize",						Natives::DynamicTextDrawLetterSize},
+	{"DynamicTextDrawTextSize",							Natives::DynamicTextDrawTextSize},
+	{"DynamicTextDrawAlignment",						Natives::DynamicTextDrawAlignment},
+	{"DynamicTextDrawColour",							Natives::DynamicTextDrawColour},
+	{"DynamicTextDrawUseBox",							Natives::DynamicTextDrawUseBox},
+	{"DynamicTextDrawBoxColour",						Natives::DynamicTextDrawBoxColour},
+	{"DynamicTextDrawSetShadow",						Natives::DynamicTextDrawSetShadow},
+	{"DynamicTextDrawSetOutline",						Natives::DynamicTextDrawSetOutline},
+	{"DynamicTextDrawBackgroundColour",					Natives::DynamicTextDrawBackgroundColour},
+	{"DynamicTextDrawFont",								Natives::DynamicTextDrawFont},
+	{"DynamicTextDrawSetProportional",					Natives::DynamicTextDrawSetProportional},
+	{"DynamicTextDrawSetSelectable",					Natives::DynamicTextDrawSetSelectable},
+	{"DynamicTextDrawShowForPlayer",					Natives::DynamicTextDrawShowForPlayer},
+	{"DynamicTextDrawHideForPlayer",					Natives::DynamicTextDrawHideForPlayer},
+	{"DynamicTextDrawShowForAll",						Natives::DynamicTextDrawShowForAll},
+	{"DynamicTextDrawHideForAll",						Natives::DynamicTextDrawHideForAll},
+	{"DynamicTextDrawSetString",						Natives::DynamicTextDrawSetString},
+	{"DynamicTextDrawSetPreviewModel",					Natives::DynamicTextDrawSetPreviewModel},
+	{"DynamicTextDrawSetPreviewRot",					Natives::DynamicTextDrawSetPreviewRot},
+	{"DynamicTextDrawSetPreviewVehCol",					Natives::DynamicTextDrawSetPreviewVehicleColours},
+	{"IsValidDynamicTextDraw",							Natives::IsValidDynamicTextDraw},
+	{"IsDynTextDrawVisibleForPlayer",					Natives::IsDynamicTextDrawVisibleForPlayer},
+	{"DynamicTextDrawGetString",						Natives::DynamicTextDrawGetString},
+	{"DynamicTextDrawSetPos",							Natives::DynamicTextDrawSetPos},
+	{"DynamicTextDrawGetLetterSize",					Natives::DynamicTextDrawGetLetterSize},
+	{"DynamicTextDrawGetTextSize",						Natives::DynamicTextDrawGetTextSize},
+	{"DynamicTextDrawGetPos",							Natives::DynamicTextDrawGetPos},
+	{"DynamicTextDrawGetColour",						Natives::DynamicTextDrawGetColour},
+	{"DynamicTextDrawGetBoxColour",						Natives::DynamicTextDrawGetBoxColour},
+	{"DynamicTextDrawGetBackgroundCol",					Natives::DynamicTextDrawGetBackgroundColour},
+	{"DynamicTextDrawGetShadow",						Natives::DynamicTextDrawGetShadow},
+	{"DynamicTextDrawGetOutline",						Natives::DynamicTextDrawGetOutline},
+	{"DynamicTextDrawGetFont",							Natives::DynamicTextDrawGetFont},
+	{"DynamicTextDrawIsBox",							Natives::DynamicTextDrawIsBox},
+	{"DynamicTextDrawIsProportional",					Natives::DynamicTextDrawIsProportional},
+	{"DynamicTextDrawIsSelectable",						Natives::DynamicTextDrawIsSelectable},
+	{"DynamicTextDrawGetAlignment",						Natives::DynamicTextDrawGetAlignment},
+	{"DynamicTextDrawGetPreviewModel",					Natives::DynamicTextDrawGetPreviewModel},
+	{"DynamicTextDrawGetPreviewRot",					Natives::DynamicTextDrawGetPreviewRot},
+	{"DynamicTextDrawGetPreviewVehCol",					Natives::DynamicTextDrawGetPreviewVehicleColours},
+	{"DynamicTextDrawGetRealID",						Natives::DynamicTextDrawGetRealID},
+	{"DynamicTextDrawGetSize",							Natives::DynamicTextDrawGetSize},
+
+	// Player
+	{"CreateDynamicPlayerTextDraw",						Natives::CreateDynamicPlayerTextDraw},
+	{"DestroyDynamicPlayerTextDraw",					Natives::DestroyDynamicPlayerTextDraw},
+	{"DynamicPlayerTextDrawLetterSize",					Natives::DynamicPlayerTextDrawLetterSize},
+	{"DynamicPlayerTextDrawTextSize",					Natives::DynamicPlayerTextDrawTextSize},
+	{"DynamicPlayerTextDrawAlignment",					Natives::DynamicPlayerTextDrawAlignment},
+	{"DynamicPlayerTextDrawColour",						Natives::DynamicPlayerTextDrawColour},
+	{"DynamicPlayerTextDrawUseBox",						Natives::DynamicPlayerTextDrawUseBox},
+	{"DynamicPlayerTextDrawBoxColor",					Natives::DynamicPlayerTextDrawBoxColor},
+	{"DynamicPlayerTextDrawSetShadow",					Natives::DynamicPlayerTextDrawSetShadow},
+	{"DynamicPlayerTextDrawSetOutline",					Natives::DynamicPlayerTextDrawSetOutline},
+	{"DynamicPlayerTextDrawBGColour",					Natives::DynamicPlayerTextDrawBackgroundColour},
+	{"DynamicPlayerTextDrawFont",						Natives::DynamicPlayerTextDrawFont},
+	{"DynPlayerTextSetProportional",					Natives::DynamicPlayerTextDrawSetProportional},
+	{"DynamicPlayerTextDrawSelectable",					Natives::DynamicPlayerTextDrawSetSelectable},
+	{"DynamicPlayerTextDrawShow",						Natives::DynamicPlayerTextDrawShow},
+	{"DynamicPlayerTextDrawHide",						Natives::DynamicPlayerTextDrawHide},
+	{"DynamicPlayerTextDrawSetString",					Natives::DynamicPlayerTextDrawSetString},
+	{"DynamicPlayerTextDrawSetPrevMdl",					Natives::DynamicPlayerTextDrawSetPreviewModel},
+	{"DynamicPlayerTextDrawSetPrevRot",					Natives::DynamicPlayerTextDrawSetPreviewRot},
+	{"DynamicPlayerTextDrawPrevVehCol",					Natives::DynamicPlayerTextDrawSetPreviewVehicleColours},
+	{"IsValidDynamicPlayerTextDraw",					Natives::IsValidDynamicPlayerTextDraw},
+	{"IsDynamicPlayerTextDrawVisible",					Natives::IsDynamicPlayerTextDrawVisible},
+	{"DynamicPlayerTextDrawGetString",					Natives::DynamicPlayerTextDrawGetString},
+	{"DynamicPlayerTextDrawSetPos",						Natives::DynamicPlayerTextDrawSetPos},
+	{"DynPlayerTextDrawGetLetterSize",					Natives::DynamicPlayerTextDrawGetLetterSize},
+	{"DynPlayerTextDrawGetTextSize",					Natives::DynamicPlayerTextDrawGetTextSize},
+	{"DynamicPlayerTextDrawGetPos",						Natives::DynamicPlayerTextDrawGetPos},
+	{"DynamicPlayerTextDrawGetColour",					Natives::DynamicPlayerTextDrawGetColour},
+	{"DynamicPlayerTextDrawGetBoxCol",					Natives::DynamicPlayerTextDrawGetBoxColour},
+	{"DynPlayerTextDrawGetBGColour",					Natives::DynamicPlayerTextDrawGetBackgroundColour},
+	{"DynamicPlayerTextDrawGetShadow",					Natives::DynamicPlayerTextDrawGetShadow},
+	{"DynamicPlayerTextDrawGetOutline",					Natives::DynamicPlayerTextDrawGetOutline},
+	{"DynamicPlayerTextDrawGetFont",					Natives::DynamicPlayerTextDrawGetFont},
+	{"DynamicPlayerTextDrawIsBox",						Natives::DynamicPlayerTextDrawIsBox},
+	{"DynPlayerTextDrawIsProportional",					Natives::DynamicPlayerTextDrawIsProportional},
+	{"DynPlayerTextDrawIsSelectable",					Natives::DynamicPlayerTextDrawIsSelectable},
+	{"DynPlayerTextDrawGetAlignment",					Natives::DynamicPlayerTextDrawGetAlignment},
+	{"DynPlayerTextDrawGetPreviewMdl",					Natives::DynamicPlayerTextDrawGetPreviewModel},
+	{"DynPlayerTextDrawGetPreviewRot",					Natives::DynamicPlayerTextDrawGetPreviewRot},
+	{"DynPlayerTextDrawGetPrevVehCol",					Natives::DynamicPlayerTextDrawGetPreviewVehicleColours},
+	{"PlayerTextDrawGetRealID",							Natives::PlayerTextDrawGetRealID},
+	{"PlayerTextDrawSize",								Natives::PlayerTextDrawSize},
+
+	// Data (Int)
+	{"DynamicTextDraw_SetIntData",						Natives::DynamicTextDraw_SetIntData},
+	{"DynamicTextDraw_GetIntData",						Natives::DynamicTextDraw_GetIntData},
+	{"DynamicTextDraw_ClearIntData",					Natives::DynamicTextDraw_ClearIntData},
+
+	// Data (Float)
+	{"DynamicTextDraw_SetFloatData",					Natives::DynamicTextDraw_SetFloatData},
+	{"DynamicTextDraw_GetFloatData",					Natives::DynamicTextDraw_GetFloatData},
+
+	// Data (Array)
+	{ "DynamicTextDraw_SetArrayData",					Natives::DynamicTextDraw_SetArrayData},
+	{ "DynamicTextDraw_GetArrayData",					Natives::DynamicTextDraw_GetArrayData},
+	{ "DynamicTextDraw_ClearArrayData",					Natives::DynamicTextDraw_ClearArrayData},
 
 	// NULL
 	{NULL, NULL}
@@ -171,19 +226,121 @@ PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
 	sampgdk::ProcessTick();
 }
 
+PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerConnect(int playerid)
+{
+	// Baðlanan oyuncuyu listeye ekle
+	if (playerid >= 0 && playerid < MAX_PLAYERS)
+	{
+		GlobalText::PlayerList.insert(playerid);
+	}
+	return true;
+}
+
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerDisconnect(int playerid, int reason)
 {
+	// Baðlanan oyuncuda textdraw gözüküyor mu?
+	for (auto textList = GlobalText::gTextVisible.begin(); textList != GlobalText::gTextVisible.end(); textList++)
+	{
+		// Tüm textdrawlarda bu oyuncuyu ara
+		auto p = GlobalText::gTextVisible[textList->first].find(playerid);
+		if (p != GlobalText::gTextVisible[textList->first].end())
+		{
+			// Textdraw da gösteriliyorsa oyuncuyu kaldýr
+			GlobalText::gTextVisible[textList->first].erase(p);
+		}
+
+		// Gösterilen textdraw da oyuncu kalmadýysa
+		if (GlobalText::gTextVisible[textList->first].empty())
+		{
+			// Textdrawý sunucudan sil
+			auto t = GlobalText::gText->find(textList->first);
+			if (t != GlobalText::gText->end())
+			{
+				if (t->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
+				{
+					TextDrawDestroy(t->second->real_id);
+					t->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+				}
+			}
+		}
+	}
+
+	// Baðlanan oyuncuyu listeden kaldýr
+	GlobalText::PlayerList.erase(playerid);
+
 	// PlayerTextdraw havuzunu ve slot manageri temizle
-	PlayerText::Destroy_PlayerText(playerid);
+	PlayerText::Destroy(playerid);
 	return true;
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickTextDraw(int playerid, int clickedid)
 {
+	// ESC bastýysa
+	if (clickedid == INVALID_TEXT_DRAW)
+	{
+		int idx;
+		for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
+		{
+			if (!amx_FindPublic(*p, "OnCancelDynamicTextDraw", &idx))
+			{
+				amx_Push(*p, static_cast<cell>(playerid));
+				amx_Exec(*p, NULL, idx);
+			}
+		}
+	}
+	else
+	{
+		if (!gAmx.empty() && !GlobalText::gText->empty())
+		{
+			for (std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->begin(); it != GlobalText::gText->end(); it++)
+			{
+				if (it->second->real_id == clickedid)
+				{
+					int idx;
+					for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
+					{
+						if (!amx_FindPublic(*p, "OnClickDynamicTextDraw", &idx))
+						{
+							amx_Push(*p, static_cast<cell>(it->first));
+							amx_Push(*p, static_cast<cell>(playerid));
+							amx_Exec(*p, NULL, idx);
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
 	return false;
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int playertextid)
 {
+	if (!gAmx.empty() && PlayerText::pText[playerid] != nullptr && !PlayerText::pText[playerid]->empty())
+	{
+		for (auto it = PlayerText::pText[playerid]->begin(); it != PlayerText::pText[playerid]->end(); it++)
+		{
+			if (it->second->real_id == playertextid)
+			{
+				int idx;
+				for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
+				{
+					if (!amx_FindPublic(*p, "OnClickDynamicPlayerTextDraw", &idx)) 
+					{
+						//	playerid, textid
+						//
+						//		|		|
+						//
+						//		0		1
+						//
+						amx_Push(*p, static_cast<cell>(it->first));	//	1
+						amx_Push(*p, static_cast<cell>(playerid));	//	0
+						amx_Exec(*p, NULL, idx);
+					}
+				}
+				break;
+			}
+		}
+	}
 	return false;
 }

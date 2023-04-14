@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <sstream>
-#include "sampgdk.hpp"
+#pragma once
 
-namespace Service
-{
-	void Native_SetInt(AMX* amx, cell output, int value);
-	void Native_SetFloat(AMX* amx, cell output, float value);
-	void Native_SetString(AMX* amx, cell output, cell size, std::string string);
-	std::string Native_GetString(AMX* amx, cell input);
-	char* FormatString(AMX* amx, cell* params, int32_t parm);
-};
+#include "amx/amx.h"
+
+#ifndef _INCLUDE_FORMATTING_H
+#define _INCLUDE_FORMATTING_H
+
+ //Amx Templatized Cell Printf
+template <typename D, typename S>
+size_t atcprintf(D* buffer, size_t maxlen, const S* format, AMX* amx, cell* params, int* param);
+
+#endif //_INCLUDE_FORMATTING_H

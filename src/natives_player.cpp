@@ -17,12 +17,12 @@
 #include "natives.hpp"
 #include "service.hpp"
 #include "slot_manager.hpp"
-#include "player_textdraw.hpp"
+#include "textdraw_data.hpp"
 
-cell AMX_NATIVE_CALL Natives::CreatePTextDraw(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::CreateDynamicPlayerTextDraw(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
-	CHECK_PARAMS(4);
+	CHECK_PARAMS(params[0] / sizeof(cell));
 
 	// Oyuncu kimligini al
 	int playerid = static_cast<int>(params[1]);
@@ -31,14 +31,14 @@ cell AMX_NATIVE_CALL Natives::CreatePTextDraw(AMX* amx, cell* params)
 	if (PlayerText::pText[playerid] == nullptr)
 	{
 		// Yeni bir pointer olustur
-		std::unordered_map<int, PlayerData*>* pointer = new std::unordered_map<int, PlayerData*>;
+		std::unordered_map<int, Text_Data*>* pointer = new std::unordered_map<int, Text_Data*>;
 
 		// Olusturulan pointeri kaydet
 		PlayerText::pText[playerid] = pointer;
 	}
 
 	// Yeni bir kimlik al
-	int auto_increment = slot_manager::get_id(playerid);
+	int auto_increment = slot_manager_player::get_id(playerid);
 
 	// Yeni bir map haritasi olustur (Extra ID) icin
 	std::map<int, int>* map = new std::map<int, int>();
@@ -47,11 +47,11 @@ cell AMX_NATIVE_CALL Natives::CreatePTextDraw(AMX* amx, cell* params)
 	std::vector<int>* arr = new std::vector<int>();
 
 	// PlayerData verilerini olustur
-	PlayerData* data		= new PlayerData();
+	Text_Data* data			= new Text_Data();
 	data->real_id			= -1;
 	data->create_x			= amx_ctof(params[2]);
 	data->create_y			= amx_ctof(params[3]);
-	data->text				= Service::Native_GetString(amx, params[4]);
+	data->text				= Service::FormatString(amx, params, 4);
 	data->lettersize_x		= 0.0;
 	data->lettersize_y		= 0.0;
 	data->textsize_x		= 0.0;
@@ -74,6 +74,7 @@ cell AMX_NATIVE_CALL Natives::CreatePTextDraw(AMX* amx, cell* params)
 	data->veh_col1			= -2;
 	data->veh_col2			= -2;
 	data->extra_id			= map;
+	data->float_data		= 0.0;
 	data->array_data		= arr;
 
 	// Veriyi pointera aktar
@@ -81,7 +82,7 @@ cell AMX_NATIVE_CALL Natives::CreatePTextDraw(AMX* amx, cell* params)
 	return static_cast<int>(auto_increment);
 }
 
-cell AMX_NATIVE_CALL Natives::DestroyPTextdraw(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DestroyDynamicPlayerTextDraw(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(2);
@@ -92,7 +93,10 @@ cell AMX_NATIVE_CALL Natives::DestroyPTextdraw(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -108,7 +112,7 @@ cell AMX_NATIVE_CALL Natives::DestroyPTextdraw(AMX* amx, cell* params)
 		}
 
 		// Bu kimligi slot_manager icerisine aktar ve daha sonradan tekrar kullanilabilir hale getir
-		slot_manager::remove_id(playerid, static_cast<int>(params[2]));
+		slot_manager_player::remove_id(playerid, static_cast<int>(params[2]));
 
 		// Extra id kaldir
 		delete it->second->extra_id;
@@ -128,12 +132,15 @@ cell AMX_NATIVE_CALL Natives::DestroyPTextdraw(AMX* amx, cell* params)
 	else
 	{
 		// Silme islemi basarisiz
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextLetterSize(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawLetterSize(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(4);
@@ -144,7 +151,10 @@ cell AMX_NATIVE_CALL Natives::PTextLetterSize(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -164,12 +174,15 @@ cell AMX_NATIVE_CALL Natives::PTextLetterSize(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextSize(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawTextSize(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(4);
@@ -180,7 +193,10 @@ cell AMX_NATIVE_CALL Natives::PTextSize(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -200,12 +216,15 @@ cell AMX_NATIVE_CALL Natives::PTextSize(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextAlignment(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawAlignment(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -216,7 +235,10 @@ cell AMX_NATIVE_CALL Natives::PTextAlignment(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -235,12 +257,15 @@ cell AMX_NATIVE_CALL Natives::PTextAlignment(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextColor(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawColour(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -251,7 +276,10 @@ cell AMX_NATIVE_CALL Natives::PTextColor(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -270,12 +298,15 @@ cell AMX_NATIVE_CALL Natives::PTextColor(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextUseBox(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawUseBox(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -286,7 +317,10 @@ cell AMX_NATIVE_CALL Natives::PTextUseBox(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -305,12 +339,15 @@ cell AMX_NATIVE_CALL Natives::PTextUseBox(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextBoxColor(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawBoxColor(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -321,7 +358,10 @@ cell AMX_NATIVE_CALL Natives::PTextBoxColor(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -340,12 +380,15 @@ cell AMX_NATIVE_CALL Natives::PTextBoxColor(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextShadow(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetShadow(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -356,7 +399,10 @@ cell AMX_NATIVE_CALL Natives::PTextShadow(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -373,12 +419,15 @@ cell AMX_NATIVE_CALL Natives::PTextShadow(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextOutline(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetOutline(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -389,7 +438,10 @@ cell AMX_NATIVE_CALL Natives::PTextOutline(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -406,12 +458,15 @@ cell AMX_NATIVE_CALL Natives::PTextOutline(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextBGColor(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawBackgroundColour(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -422,7 +477,10 @@ cell AMX_NATIVE_CALL Natives::PTextBGColor(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -439,12 +497,15 @@ cell AMX_NATIVE_CALL Natives::PTextBGColor(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextFont(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawFont(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -455,7 +516,10 @@ cell AMX_NATIVE_CALL Natives::PTextFont(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -472,12 +536,15 @@ cell AMX_NATIVE_CALL Natives::PTextFont(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextProportional(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetProportional(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -488,7 +555,10 @@ cell AMX_NATIVE_CALL Natives::PTextProportional(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -505,12 +575,15 @@ cell AMX_NATIVE_CALL Natives::PTextProportional(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextSelectable(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetSelectable(AMX* amx, cell* params)
 {
 	// Parametleri kontrol et
 	CHECK_PARAMS(3);
@@ -521,7 +594,10 @@ cell AMX_NATIVE_CALL Natives::PTextSelectable(AMX* amx, cell* params)
 	// Pointer var mi ?
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -538,12 +614,15 @@ cell AMX_NATIVE_CALL Natives::PTextSelectable(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextShow(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawShow(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -563,7 +642,10 @@ cell AMX_NATIVE_CALL Natives::PTextShow(AMX* amx, cell* params)
 			int text_id = CreatePlayerTextDraw(playerid, it->second->create_x, it->second->create_y, it->second->text.c_str());
 			if (text_id == INVALID_TEXT_DRAW)
 			{
-				sampgdk::logprintf("[textdraw.streamer] %s: A maximum of %d textdraws can be displayed on a player.", __func__, MAX_PLAYER_TEXT_DRAWS);
+				if (Plugin_Settings::logMode)
+				{
+					sampgdk::logprintf("[textdraw.streamer] %s: A maximum of %d textdraws can be displayed on a player.", __func__, MAX_PLAYER_TEXT_DRAWS);
+				}
 			}
 			else
 			{
@@ -642,12 +724,15 @@ cell AMX_NATIVE_CALL Natives::PTextShow(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextHide(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawHide(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -655,12 +740,14 @@ cell AMX_NATIVE_CALL Natives::PTextHide(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-
 	if (it != PlayerText::pText[playerid]->end())
 	{
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
@@ -672,20 +759,26 @@ cell AMX_NATIVE_CALL Natives::PTextHide(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextSetString(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetString(AMX* amx, cell* params)
 {
-	CHECK_PARAMS(3);
+	CHECK_PARAMS(params[0] / sizeof(cell));
 
 	int playerid = static_cast<int>(params[1]);
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -693,7 +786,7 @@ cell AMX_NATIVE_CALL Natives::PTextSetString(AMX* amx, cell* params)
 
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		it->second->text = Service::Native_GetString(amx, params[3]);
+		it->second->text = Service::FormatString(amx, params, 3);
 
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 		{
@@ -703,12 +796,15 @@ cell AMX_NATIVE_CALL Natives::PTextSetString(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextPreviewModel(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewModel(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
@@ -716,7 +812,10 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewModel(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -734,12 +833,15 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewModel(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextPreviewRot(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewRot(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(6);
 
@@ -747,7 +849,10 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewRot(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -768,12 +873,15 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewRot(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PTextPreviewVehCol(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewVehicleColours(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -781,7 +889,10 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewVehCol(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -800,12 +911,15 @@ cell AMX_NATIVE_CALL Natives::PTextPreviewVehCol(AMX* amx, cell* params)
 	}
 	else
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: An item with this ID (%d) could not be found.", __func__, static_cast<int>(params[2]));
+		}
 	}
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::IsValidPlayerTextDraw__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::IsValidDynamicPlayerTextDraw(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -813,7 +927,10 @@ cell AMX_NATIVE_CALL Natives::IsValidPlayerTextDraw__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -825,7 +942,7 @@ cell AMX_NATIVE_CALL Natives::IsValidPlayerTextDraw__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::IsPlayerTextDrawVisible__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::IsDynamicPlayerTextDrawVisible(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -833,7 +950,10 @@ cell AMX_NATIVE_CALL Natives::IsPlayerTextDrawVisible__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -848,7 +968,7 @@ cell AMX_NATIVE_CALL Natives::IsPlayerTextDrawVisible__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetString__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetString(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -856,7 +976,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetString__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -870,7 +993,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetString__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetPos__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPos(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -878,7 +1001,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetPos__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -894,7 +1020,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetPos__(AMX* amx, cell* params)
 			it->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
 		}
 
-		PlayerText::pText_Reload(playerid, static_cast<int>(params[2]));
+		PlayerText::Reload(playerid, it);
 
 		return 1;
 	}
@@ -902,7 +1028,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetPos__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetLetterSize__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetLetterSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -910,7 +1036,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetLetterSize__(AMX* amx, cell* para
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -925,7 +1054,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetLetterSize__(AMX* amx, cell* para
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetTextSize__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetTextSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -933,7 +1062,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetTextSize__(AMX* amx, cell* params
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -948,7 +1080,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetTextSize__(AMX* amx, cell* params
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPos__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPos(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -956,7 +1088,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPos__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -971,7 +1106,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPos__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetColor__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -979,7 +1114,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetColor__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -992,7 +1130,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetColor__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBoxColor__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetBoxColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1000,7 +1138,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBoxColor__(AMX* amx, cell* params
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1013,7 +1154,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBoxColor__(AMX* amx, cell* params
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBGColor__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetBackgroundColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1021,7 +1162,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBGColor__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1034,7 +1178,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetBGColor__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetShadow__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetShadow(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1042,7 +1186,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetShadow__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1055,7 +1202,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetShadow__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetOutline__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetOutline(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1063,7 +1210,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetOutline__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1076,7 +1226,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetOutline__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetFont__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetFont(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1084,7 +1234,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetFont__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1097,7 +1250,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetFont__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsBox__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsBox(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1105,7 +1258,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsBox__(AMX* amx, cell* params)
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1118,7 +1274,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsBox__(AMX* amx, cell* params)
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsProportional__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsProportional(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1126,7 +1282,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsProportional__(AMX* amx, cell* par
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1139,7 +1298,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsProportional__(AMX* amx, cell* par
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsSelectable__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsSelectable(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1147,7 +1306,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsSelectable__(AMX* amx, cell* param
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1160,7 +1322,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawIsSelectable__(AMX* amx, cell* param
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetAlignment__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetAlignment(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1168,7 +1330,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetAlignment__(AMX* amx, cell* param
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1181,7 +1346,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetAlignment__(AMX* amx, cell* param
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewModel__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewModel(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(2);
 
@@ -1189,7 +1354,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewModel__(AMX* amx, cell* pa
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1202,7 +1370,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewModel__(AMX* amx, cell* pa
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewRot__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewRot(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(6);
 
@@ -1210,7 +1378,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewRot__(AMX* amx, cell* para
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1227,7 +1398,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewRot__(AMX* amx, cell* para
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewVehCo__(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewVehicleColours(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
@@ -1235,7 +1406,10 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewVehCo__(AMX* amx, cell* pa
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
+		}
 		return 0;
 	}
 
@@ -1250,186 +1424,27 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetPreviewVehCo__(AMX* amx, cell* pa
 	return 0;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetExtraID(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(4);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		int index = static_cast<int>(params[3]);
-		std::map<int, int>* pointer = (std::map<int, int>*)it->second->extra_id;
-		(*pointer)[index] = static_cast<int>(params[4]);
-		return 1;
-	}
-
-	return 0;
-}
-
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetExtraID(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(3);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		int index = static_cast<int>(params[3]);
-		std::map<int, int>* pointer = (std::map<int, int>*)it->second->extra_id;
-		return static_cast<int>((*pointer)[index]);
-	}
-
-	return 0;
-}
-
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawResetExtraID(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(2);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		delete it->second->extra_id;
-
-		std::map<int, int>* map = new std::map<int, int>();
-
-		it->second->extra_id = map;
-
-		return 1;
-	}
-
-	return 0;
-}
-
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawSetArrayData(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(4);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		cell* array = NULL;
-		amx_GetAddr(amx, params[3], &array);
-		it->second->array_data->clear();
-		for (int i = 0; i < static_cast<int>(params[4]); ++i)
-		{
-			it->second->array_data->push_back(static_cast<int>(array[i]));
-		}
-		return 1;
-	}
-
-	return 0;
-}
-
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetArrayData(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(4);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		cell* array = NULL;
-		int i = 0;
-		amx_GetAddr(amx, params[3], &array);
-		for (std::vector<int>::const_iterator o = it->second->array_data->begin(); o != it->second->array_data->end(); ++o)
-		{
-			if (i == static_cast<int>(params[4]))
-			{
-				break;
-			}
-			array[i++] = static_cast<cell>(*o);
-		}
-		return 1;
-	}
-
-	return 0;
-}
-
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawRemoveArrayData(AMX* amx, cell* params)
-{
-	CHECK_PARAMS(2);
-
-	int playerid = static_cast<int>(params[1]);
-
-	if (PlayerText::pText[playerid] == nullptr)
-	{
-		sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
-		return 0;
-	}
-
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-
-	if (it != PlayerText::pText[playerid]->end())
-	{
-		delete it->second->array_data;
-
-		std::vector<int>* arr = new std::vector<int>();
-
-		it->second->array_data = arr;
-
-		return 1;
-	}
-
-	return 0;
-}
-
 cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetRealID(AMX* amx, cell* params)
 {
-	CHECK_PARAMS(2);
-
+	CHECK_PARAMS(3);
 	int playerid = static_cast<int>(params[1]);
 
-	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
-
-	if (it != PlayerText::pText[playerid]->end())
+	if (PlayerText::pText[playerid] == nullptr)
 	{
-		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
-			return static_cast<cell>(it->second->real_id);
+		if (Plugin_Settings::logMode)
+		{
+			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
 		}
+		Service::Native_SetInt(amx, params[3], INVALID_DYNAMIC_PLAYER_TEXTDRAW);
+		return 0;
 	}
 
-	return 0;
+	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
+	if (it != PlayerText::pText[playerid]->end())
+	{
+		Service::Native_SetInt(amx, params[3], it->second->real_id);
+	}
+	return 1;
 }
 
 cell AMX_NATIVE_CALL Natives::PlayerTextDrawSize(AMX* amx, cell* params)

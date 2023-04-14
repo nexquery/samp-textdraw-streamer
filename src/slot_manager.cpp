@@ -14,33 +14,77 @@
  * limitations under the License.
  */
 
-
-#pragma once
-
 #include "slot_manager.hpp"
 
-std::map<int, int> slot_manager::next_Id;
-std::map<int, std::priority_queue<int, std::vector<int>, std::greater<int>>> slot_manager::p_Ids;
+ /***
+  *     .d8888b.  888          888               888
+  *    d88P  Y88b 888          888               888
+  *    888    888 888          888               888
+  *    888        888  .d88b.  88888b.   8888b.  888
+  *    888  88888 888 d88""88b 888 "88b     "88b 888
+  *    888    888 888 888  888 888  888 .d888888 888
+  *    Y88b  d88P 888 Y88..88P 888 d88P 888  888 888
+  *     "Y8888P88 888  "Y88P"  88888P"  "Y888888 888
+  *
+  */
 
-int slot_manager::get_id(int playerid)
+int slot_manager_global::next_Id;
+std::priority_queue<int, std::vector<int>, std::greater<int>> slot_manager_global::global_ids;
+
+int slot_manager_global::get_id()
 {
-	if (p_Ids[playerid].empty()) {
-		return 1 + next_Id[playerid]++;
+	if (slot_manager_global::global_ids.empty()) {
+		return 1 + slot_manager_global::next_Id++;
 	}
 
-	int low_id = p_Ids[playerid].top();
-	p_Ids[playerid].pop();
+	int low_id = slot_manager_global::global_ids.top();
+	slot_manager_global::global_ids.pop();
+	
+	return low_id;
+}
+
+void slot_manager_global::remove_id(int value)
+{
+	slot_manager_global::global_ids.push(value);
+}
+
+
+ /***
+  *    8888888b.  888
+  *    888   Y88b 888
+  *    888    888 888
+  *    888   d88P 888  8888b.  888  888  .d88b.  888d888
+  *    8888888P"  888     "88b 888  888 d8P  Y8b 888P"
+  *    888        888 .d888888 888  888 88888888 888
+  *    888        888 888  888 Y88b 888 Y8b.     888
+  *    888        888 "Y888888  "Y88888  "Y8888  888
+  *                                 888
+  *                            Y8b d88P
+  *                             "Y88P"
+  */
+
+std::map<int, int> slot_manager_player::next_Id;
+std::map<int, std::priority_queue<int, std::vector<int>, std::greater<int>>> slot_manager_player::p_Ids;
+
+int slot_manager_player::get_id(int playerid)
+{
+	if (slot_manager_player::p_Ids[playerid].empty()) {
+		return 1 + slot_manager_player::next_Id[playerid]++;
+	}
+
+	int low_id = slot_manager_player::p_Ids[playerid].top();
+	slot_manager_player::p_Ids[playerid].pop();
 
 	return low_id;
 }
 
-void slot_manager::remove_id(int playerid, int value)
+void slot_manager_player::remove_id(int playerid, int value)
 {
-	p_Ids[playerid].push(value);
+	slot_manager_player::p_Ids[playerid].push(value);
 }
 
-void slot_manager::reset_id(int playerid)
+void slot_manager_player::reset_id(int playerid)
 {
-	next_Id[playerid] = 0;
-	p_Ids[playerid] = std::priority_queue<int, std::vector<int>, std::greater<int>>();
+	slot_manager_player::next_Id[playerid] = 0;
+	slot_manager_player::p_Ids[playerid] = std::priority_queue<int, std::vector<int>, std::greater<int>>();
 }

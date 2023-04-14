@@ -17,10 +17,24 @@ add_definitions(-DSAMPGDK_AMALGAMATION)
 
 add_samp_plugin(textdraw-streamer
 	amxplugin.cpp
+	compilation_date.hpp
+	format.cpp
+	format.hpp
 	main.cpp
+	natives.hpp
+	natives_data.cpp
+	natives_global.cpp
+	natives_player.cpp
 	plugin.h
+	plugin_version.hpp
 	plugincommon.h
 	sampgdk.cpp
-	sampgdk.h
+	sampgdk.hpp
+	service.cpp
+	service.hpp
+	slot_manager.cpp
+	slot_manager.hpp
+	textdraw_data.cpp
+	textdraw_data.hpp
 	textdraw-streamer.def
 )

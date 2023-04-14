@@ -15,6 +15,7 @@
  */
 
 #include "service.hpp"
+#include "format.hpp"
 
 void Service::Native_SetInt(AMX* amx, cell output, int value)
 {
@@ -42,4 +43,18 @@ std::string Service::Native_GetString(AMX* amx, cell input)
 	char* string = NULL;
 	amx_StrParam(amx, input, string);
 	return string ? string : "";
+}
+
+cell* get_amxaddr(AMX* amx, cell amx_addr)
+{
+	return (cell*)(amx->base + (int)(((AMX_HEADER*)amx->base)->dat + amx_addr));
+}
+
+char* Service::FormatString(AMX* amx, cell* params, int32_t parm)
+{
+	static char outbuf[4096];
+	cell* addr = get_amxaddr(amx, params[parm++]);
+	int32_t len = atcprintf(outbuf, sizeof(outbuf) - 1, addr, amx, params, &parm);
+	outbuf[len] = 0;
+	return outbuf;
 }

@@ -19,7 +19,7 @@
 #include <map>
 #include <queue>
 
-class slot_manager
+class slot_manager_player
 {
 public:
 	static int get_id(int playerid);
@@ -29,4 +29,14 @@ public:
 private:
 	static std::map<int, int> next_Id;
 	static std::map<int, std::priority_queue<int, std::vector<int>, std::greater<int>>> p_Ids;
+};
+
+class slot_manager_global
+{
+public:
+	static int get_id();
+	static void remove_id(int value);
+private:
+	static int next_Id;
+	static std::priority_queue<int, std::vector<int>, std::greater<int>> global_ids;
 };

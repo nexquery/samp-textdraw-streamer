@@ -20,8 +20,15 @@
 #include <map>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #define	INVALID_DYNAMIC_PLAYER_TEXTDRAW	(-1)
+
+enum TDStreamer_Type
+{
+	GLOBAL = 0,
+	PLAYER
+};
 
 struct DefaultText
 {
@@ -48,7 +55,7 @@ struct DefaultText
 	int			veh_col2		= -2;
 };
 
-struct PlayerData
+struct Text_Data
 {
 	int					real_id{};
 	float				create_x{};
@@ -76,6 +83,7 @@ struct PlayerData
 	int					veh_col1{};
 	int					veh_col2{};
 	std::map<int, int>* extra_id{};
+	float				float_data{};
 	std::vector<int>*	array_data{};
 };
 
@@ -83,7 +91,24 @@ class PlayerText
 {
 public:
 	static DefaultText Default;
-	static std::unordered_map<int, std::unordered_map<int, PlayerData*>*> pText;
-	static void Destroy_PlayerText(int playerid);
-	static void pText_Reload(int playerid, int textid);
+	static std::unordered_map<int, std::unordered_map<int, Text_Data*>*> pText;
+	static void Destroy(int playerid);
+	static void Reload(int playerid, std::unordered_map<int, Text_Data*>::iterator it);
+};
+
+class GlobalText
+{
+public:
+	static DefaultText Default;
+	static std::unordered_set<int> PlayerList;
+	static std::unordered_map<int, Text_Data*>* gText;
+	static std::map<int, std::map<int, bool>> gTextVisible;
+	static void Destroy();
+	static void Reload(std::unordered_map<int, Text_Data*>::iterator it);
+};
+
+class Plugin_Settings
+{
+public:
+	static bool logMode;
 };

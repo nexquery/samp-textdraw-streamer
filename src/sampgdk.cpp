@@ -19,7 +19,7 @@
   #define SAMPGDK_AMALGAMATION
 #endif
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 #if SAMPGDK_WINDOWS
   #ifdef _MSC_VER
@@ -576,7 +576,7 @@ int sampgdk_array_find_remove(struct sampgdk_array *a,
 #include <stdlib.h>
 #include <string.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "init.h" */
 /* #include "log.h" */
@@ -690,7 +690,7 @@ void sampgdk_log_message(int level, const char *format, ...) {
 #ifndef SAMPGDK_INTERNAL_PLUGIN_H
 #define SAMPGDK_INTERNAL_PLUGIN_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 int sampgdk_plugin_register(void *plugin);
 int sampgdk_plugin_unregister(void *plugin);
@@ -707,7 +707,7 @@ void **sampgdk_plugin_get_plugins(int *number);
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "logprintf.h" */
 
@@ -746,7 +746,7 @@ void sampgdk_do_vlogprintf(const char *format, va_list va) {
 #include <stdlib.h>
 #include <string.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 #if SAMPGDK_WINDOWS
   #include <windows.h>
@@ -992,7 +992,7 @@ void *sampgdk_hook_trampoline(sampgdk_hook_t hook) {
 #include <errno.h>
 #include <stdlib.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 #if SAMPGDK_WINDOWS
   #include <windows.h>
@@ -1090,7 +1090,7 @@ void *sampgdk_plugin_get_handle(void *address) {
 #ifndef SAMPGDK_INTERNAL_FAKEAMX_H
 #define SAMPGDK_INTERNAL_FAKEAMX_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* Returns the global fake AMX instance. */
 AMX *sampgdk_fakeamx_amx(void);
@@ -1118,7 +1118,7 @@ void sampgdk_fakeamx_get_string(cell address, char *dest, int size);
 #ifndef SAMPGDK_INTERNAL_AMX_H
 #define SAMPGDK_INTERNAL_AMX_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 #define AMX_EXEC_GDK (-10000)
 
@@ -1227,7 +1227,7 @@ extern struct sampgdk_amx_api *sampgdk_amx_api;
 #ifndef SAMPGDK_INTERNAL_PARAM_H
 #define SAMPGDK_INTERNAL_PARAM_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 void sampgdk_param_get_cell(AMX *amx, int index, cell *param);
 void sampgdk_param_get_bool(AMX *amx, int index, bool *param);
@@ -1244,7 +1244,7 @@ cell *sampgdk_param_get_start(AMX *amx);
 
 #include <stdarg.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* Register a native function in the internal natives table. */
 int sampgdk_native_register(const char *name, AMX_NATIVE func);
@@ -1268,7 +1268,7 @@ cell sampgdk_native_invoke_array(
 #ifndef SAMPGDK_INTERNAL_CALLBACK_H
 #define SAMPGDK_INTERNAL_CALLBACK_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* Callback handler function. */
 typedef bool (*sampgdk_callback)(AMX *amx, void *func, cell *retval);
@@ -1603,7 +1603,7 @@ cell *sampgdk_param_get_start(AMX *amx) {
 #ifndef SAMPGDK_INTERNAL_TIMER_H
 #define SAMPGDK_INTERNAL_TIMER_H
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* Timer callback function.
  * There's also a public typedef TimerCallback in <sampgdk/types.h>.
@@ -1619,7 +1619,7 @@ void sampgdk_timer_process_timers(void *plugin);
 
 #endif /* !SAMPGDK_INTERNAL_TIMER_H */
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/native.h" */
 
@@ -2279,7 +2279,7 @@ bool sampgdk_callback_invoke(AMX *amx,
 #include <stdlib.h>
 #include <string.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "amx.h" */
 /* #include "array.h" */
@@ -2583,7 +2583,7 @@ SAMPGDK_MODULE_CLEANUP(amxhooks) {
   _sampgdk_amxhooks_destroy();
 }
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 SAMPGDK_API(int, sampgdk_GetVersion(void)) {
   return SAMPGDK_VERSION_ID;
@@ -2596,7 +2596,7 @@ SAMPGDK_API(const char *, sampgdk_GetVersionString(void)) {
 #include <assert.h>
 #include <string.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/amx.h" */
 /* #include "internal/init.h" */
@@ -2712,7 +2712,7 @@ SAMPGDK_API(void, sampgdk_vlogprintf(const char *format, va_list args)) {
 #include <string.h>
 #include <time.h>
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 #if SAMPGDK_WINDOWS
   #include <windows.h>
@@ -2927,7 +2927,7 @@ void sampgdk_timer_process_timers(void *plugin) {
   }
 }
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
@@ -6105,7 +6105,7 @@ SAMPGDK_MODULE_CLEANUP(a_samp) {
 }
 
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/timer.h" */
 
@@ -6118,7 +6118,7 @@ SAMPGDK_NATIVE(bool, KillTimer(int timerid)) {
   return sampgdk_timer_kill(timerid) >= 0;
 }
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
@@ -6889,7 +6889,7 @@ SAMPGDK_MODULE_CLEANUP(a_vehicles) {
 }
 
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
@@ -7568,7 +7568,7 @@ SAMPGDK_MODULE_CLEANUP(a_objects) {
 }
 
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
@@ -7828,7 +7828,7 @@ SAMPGDK_MODULE_CLEANUP(a_actor) {
 }
 
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
@@ -10169,7 +10169,7 @@ SAMPGDK_MODULE_CLEANUP(a_players) {
 }
 
 
-#include "sampgdk.h"
+#include "sampgdk.hpp"
 
 /* #include "internal/callback.h" */
 /* #include "internal/fakeamx.h" */
