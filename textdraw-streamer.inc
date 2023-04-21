@@ -519,10 +519,10 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #define PlayerTextDrawSetOutline DynamicPlayerTextDrawSetOutline
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
-	#if defined _ALS_PlayerTextDrawBackgroundColour
+	#if defined _ALS_PlayerTextDrawBackgroundCo
 		#undef PlayerTextDrawBackgroundColour
 	#else
-		#define _ALS_PlayerTextDrawBackgroundColour
+		#define _ALS_PlayerTextDrawBackgroundCo
 	#endif
 	#define PlayerTextDrawBackgroundColour DynamicPlayerTextDrawBGColour
 #else
@@ -541,12 +541,21 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #endif
 #define PlayerTextDrawFont DynamicPlayerTextDrawFont
 /*******************************************************************************/
-#if defined _ALS_PlayerTextDrawSetProportio
-	#undef PlayerTextDrawSetProportional
+#if defined _INC_omp_textdraw
+	#if defined _ALS_PlayerTextDrawSetProportional
+		#undef PlayerTextDrawSetProportional
+	#else
+		#define _ALS_PlayerTextDrawSetProportional
+	#endif
+	#define PlayerTextDrawSetProportional DynPlayerTextSetProportional
 #else
-	#define _ALS_PlayerTextDrawSetProportio
+	#if defined _ALS_PlayerTextDrawSetProportio
+		#undef PlayerTextDrawSetProportional
+	#else
+		#define _ALS_PlayerTextDrawSetProportio
+	#endif
+	#define PlayerTextDrawSetProportional DynPlayerTextSetProportional
 #endif
-#define PlayerTextDrawSetProportional DynPlayerTextSetProportional
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetSelectabl
 	#undef PlayerTextDrawSetSelectable
