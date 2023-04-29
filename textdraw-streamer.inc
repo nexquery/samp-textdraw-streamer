@@ -310,7 +310,7 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawSetOutline
 #endif
-#define DynamicTextDrawSetOutline DynamicTextDrawSetOutline
+#define TextDrawSetOutline DynamicTextDrawSetOutline
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_TextDrawBackgroundColour
