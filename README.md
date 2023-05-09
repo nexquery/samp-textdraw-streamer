@@ -8,7 +8,7 @@ This plugin is inspired by the streamer plugin. Previously people used a lot of 
 The plugin now supports [open.mp](https://github.com/openmultiplayer/open.mp/releases) versions.
 
 ## Arrangements
-You will need to change some natives as the plugin has undergone radical changes. If you haven't used these natives before, it should work fine when you install the plugin normally. Also add format support for all texts.
+You will need to change some natives as the plugin has undergone radical changes. If you haven't used these natives before, it should work fine when you install the plugin normally.
 
 ## The Most Important Part
 Always add the textdraw-streamer library to the bottom of the available libraries.
