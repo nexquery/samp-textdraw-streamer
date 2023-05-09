@@ -189,7 +189,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynPlayerTextDrawGetPreviewRot",					Natives::DynamicPlayerTextDrawGetPreviewRot},
 	{"DynPlayerTextDrawGetPrevVehCol",					Natives::DynamicPlayerTextDrawGetPreviewVehicleColours},
 	{"PlayerTextDrawGetRealID",							Natives::PlayerTextDrawGetRealID},
-	{"PlayerTextDrawSize",								Natives::PlayerTextDrawSize},
+	{"PlayerTextDrawGetSize",							Natives::PlayerTextDrawGetSize},
 
 	// Data (Int)
 	{"DynamicTextDraw_SetIntData",						Natives::DynamicTextDraw_SetIntData},
@@ -283,13 +283,6 @@ PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickTextDraw(int playerid, int clickedid
 		{
 			if (!amx_FindPublic(*p, "OnCancelDynamicTextDraw", &idx))
 			{
-				amx_Push(*p, static_cast<cell>(playerid));
-				amx_Exec(*p, NULL, idx);
-			}
-			
-			if (!amx_FindPublic(*p, "OnClickDynamicTextDraw", &idx))
-			{
-				amx_Push(*p, static_cast<cell>(INVALID_TEXT_DRAW));
 				amx_Push(*p, static_cast<cell>(playerid));
 				amx_Exec(*p, NULL, idx);
 			}

@@ -115,7 +115,7 @@ namespace Natives
 	cell AMX_NATIVE_CALL DynamicPlayerTextDrawGetPreviewRot(AMX* amx, cell* params);
 	cell AMX_NATIVE_CALL DynamicPlayerTextDrawGetPreviewVehicleColours(AMX* amx, cell* params);
 	cell AMX_NATIVE_CALL PlayerTextDrawGetRealID(AMX* amx, cell* params);
-	cell AMX_NATIVE_CALL PlayerTextDrawSize(AMX* amx, cell* params);
+	cell AMX_NATIVE_CALL PlayerTextDrawGetSize(AMX* amx, cell* params);
 
 	// Data (Int)
 	cell AMX_NATIVE_CALL DynamicTextDraw_SetIntData(AMX* amx, cell* params);

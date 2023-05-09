@@ -34,13 +34,14 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicTextDraw(AMX* amx, cell* params)
 	std::vector<int>* arr = new std::vector<int>();
 
 	// Service::Native_GetString(amx, params[3]);
+	// Service::FormatString(amx, params, 3);
 
 	// Textdraw verilerini oluþtur
 	Text_Data* data			= new Text_Data();
 	data->real_id			= -1;
 	data->create_x			= amx_ctof(params[1]);
 	data->create_y			= amx_ctof(params[2]);
-	data->text				= Service::FormatString(amx, params, 3);
+	data->text				= Service::Native_GetString(amx, params[3]);
 	data->lettersize_x		= 0.0;
 	data->lettersize_y		= 0.0;
 	data->textsize_x		= 0.0;
@@ -556,7 +557,8 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetString(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		it->second->text = Service::FormatString(amx, params, 2);
+		// Service::FormatString(amx, params, 2);
+		it->second->text = Service::Native_GetString(amx, params[2]);
 
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 		{
