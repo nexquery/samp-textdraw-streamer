@@ -46,12 +46,14 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicPlayerTextDraw(AMX* amx, cell* params
 	// Yeni bir vector olustur (Array) verileri icin
 	std::vector<int>* arr = new std::vector<int>();
 
+	// Service::FormatString(amx, params, 4);
+
 	// PlayerData verilerini olustur
 	Text_Data* data			= new Text_Data();
 	data->real_id			= -1;
 	data->create_x			= amx_ctof(params[2]);
 	data->create_y			= amx_ctof(params[3]);
-	data->text				= Service::FormatString(amx, params, 4);
+	data->text				= Service::Native_GetString(amx, params[4]);
 	data->lettersize_x		= 0.0;
 	data->lettersize_y		= 0.0;
 	data->textsize_x		= 0.0;
@@ -786,7 +788,9 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetString(AMX* amx, cell* par
 
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		it->second->text = Service::FormatString(amx, params, 3);
+		// Service::FormatString(amx, params, 3);
+
+		it->second->text = Service::Native_GetString(amx, params[3]);
 
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 		{
@@ -1447,7 +1451,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetRealID(AMX* amx, cell* params)
 	return 1;
 }
 
-cell AMX_NATIVE_CALL Natives::PlayerTextDrawSize(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(1);
 
