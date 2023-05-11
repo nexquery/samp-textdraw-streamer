@@ -17,7 +17,6 @@
 #include "textdraw_data.hpp"
 #include "natives.hpp"
 #include "service.hpp"
-#include "format.hpp"
 
 bool Plugin_Settings::logMode = true;
 
