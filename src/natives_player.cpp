@@ -46,14 +46,12 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicPlayerTextDraw(AMX* amx, cell* params
 	// Yeni bir vector olustur (Array) verileri icin
 	std::vector<int>* arr = new std::vector<int>();
 
-	// Service::FormatString(amx, params, 4);
-
 	// PlayerData verilerini olustur
 	Text_Data* data			= new Text_Data();
 	data->real_id			= -1;
 	data->create_x			= amx_ctof(params[2]);
 	data->create_y			= amx_ctof(params[3]);
-	data->text				= Service::Native_GetString(amx, params[4]);
+	data->text				= service::formattedString(amx, params, 4, 5);
 	data->lettersize_x		= 0.0;
 	data->lettersize_y		= 0.0;
 	data->textsize_x		= 0.0;
@@ -788,9 +786,7 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetString(AMX* amx, cell* par
 
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		// Service::FormatString(amx, params, 3);
-
-		it->second->text = Service::Native_GetString(amx, params[3]);
+		it->second->text = service::formattedString(amx, params, 3, 4);
 
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 		{
@@ -990,7 +986,7 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetString(AMX* amx, cell* par
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetString(amx, params[3], params[4], it->second->text.c_str());
+		service::setString(amx, params[3], params[4], it->second->text.c_str());
 		return 1;
 	}
 
@@ -1050,8 +1046,8 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetLetterSize(AMX* amx, cell*
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetFloat(amx, params[3], it->second->lettersize_x);
-		Service::Native_SetFloat(amx, params[4], it->second->lettersize_y);
+		service::setFloat(amx, params[3], it->second->lettersize_x);
+		service::setFloat(amx, params[4], it->second->lettersize_y);
 		return 1;
 	}
 
@@ -1076,8 +1072,8 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetTextSize(AMX* amx, cell* p
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetFloat(amx, params[3], it->second->textsize_x);
-		Service::Native_SetFloat(amx, params[4], it->second->textsize_y);
+		service::setFloat(amx, params[3], it->second->textsize_x);
+		service::setFloat(amx, params[4], it->second->textsize_y);
 		return 1;
 	}
 
@@ -1102,8 +1098,8 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPos(AMX* amx, cell* params
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetFloat(amx, params[3], it->second->create_x);
-		Service::Native_SetFloat(amx, params[4], it->second->create_y);
+		service::setFloat(amx, params[3], it->second->create_x);
+		service::setFloat(amx, params[4], it->second->create_y);
 		return 1;
 	}
 
@@ -1392,10 +1388,10 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewRot(AMX* amx, cell*
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetFloat(amx, params[3], it->second->fRotX);
-		Service::Native_SetFloat(amx, params[4], it->second->fRotY);
-		Service::Native_SetFloat(amx, params[5], it->second->fRotZ);
-		Service::Native_SetFloat(amx, params[6], it->second->fZoom);
+		service::setFloat(amx, params[3], it->second->fRotX);
+		service::setFloat(amx, params[4], it->second->fRotY);
+		service::setFloat(amx, params[5], it->second->fRotZ);
+		service::setFloat(amx, params[6], it->second->fZoom);
 		return 1;
 	}
 
@@ -1420,8 +1416,8 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewVehicleColours(AMX*
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetInt(amx, params[3], it->second->veh_col1);
-		Service::Native_SetInt(amx, params[4], it->second->veh_col2);
+		service::setInt(amx, params[3], it->second->veh_col1);
+		service::setInt(amx, params[4], it->second->veh_col2);
 		return 1;
 	}
 
@@ -1439,14 +1435,14 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetRealID(AMX* amx, cell* params)
 		{
 			sampgdk::logprintf("[textdraw.streamer] %s: First create the player textdraw.", __func__);
 		}
-		Service::Native_SetInt(amx, params[3], INVALID_DYNAMIC_PLAYER_TEXTDRAW);
+		service::setInt(amx, params[3], INVALID_DYNAMIC_PLAYER_TEXTDRAW);
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(static_cast<int>(params[2]));
 	if (it != PlayerText::pText[playerid]->end())
 	{
-		Service::Native_SetInt(amx, params[3], it->second->real_id);
+		service::setInt(amx, params[3], it->second->real_id);
 	}
 	return 1;
 }

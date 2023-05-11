@@ -15,46 +15,204 @@
  */
 
 #include "service.hpp"
-#include "format.hpp"
+#include "fmt/printf.h"
 
-void Service::Native_SetInt(AMX* amx, cell output, int value)
+void service::setInt(AMX* amx, cell output, int value)
 {
 	cell* address;
 	amx_GetAddr(amx, output, &address);
 	*address = value;
 }
 
-void Service::Native_SetFloat(AMX* amx, cell output, float value)
+void service::setFloat(AMX* amx, cell output, float value)
 {
 	cell* address;
 	amx_GetAddr(amx, output, &address);
 	*address = amx_ftoc(value);
 }
 
-void Service::Native_SetString(AMX* amx, cell output, cell size, std::string string)
+void service::setString(AMX* amx, cell output, cell size, std::string string)
 {
 	cell* address = NULL;
 	amx_GetAddr(amx, output, &address);
 	amx_SetString(address, string.c_str(), 0, 0, static_cast<size_t>(size));
 }
 
-std::string Service::Native_GetString(AMX* amx, cell input)
+std::string service::getString(AMX* amx, cell param)
 {
-	char* string = NULL;
-	amx_StrParam(amx, input, string);
-	return string ? string : "";
+	cell* addr = nullptr;
+	amx_GetAddr(amx, param, &addr);
+
+	int len = 0;
+	amx_StrLen(addr, &len);
+
+	std::string string(len, ' ');
+	amx_GetString(&string[0], addr, 0, len + 1);
+	return string;
 }
 
-cell* get_amxaddr(AMX* amx, cell amx_addr)
+std::string service::formattedString(AMX* amx, cell* params, cell text_index, int32_t args_offset)
 {
-	return (cell*)(amx->base + (int)(((AMX_HEADER*)amx->base)->dat + amx_addr));
-}
+	// Argüman sayýsýný al
+	int max_args = params[0] / sizeof(cell);
 
-char* Service::FormatString(AMX* amx, cell* params, int32_t parm)
-{
-	static char outbuf[4096];
-	cell* addr = get_amxaddr(amx, params[parm++]);
-	int32_t len = atcprintf(outbuf, sizeof(outbuf) - 1, addr, amx, params, &parm);
-	outbuf[len] = 0;
-	return outbuf;
+	// Formatlanacak metini al
+	std::string metin = getString(amx, params[text_index]);
+
+	// Argüman sayýsý 1 deðilse formatlama aþamasýna geç
+	if (max_args >= args_offset)
+	{
+		// Metini tarayacak index deðerimiz
+		size_t index = 0;
+
+		// Argümanýn baþlangýç offsetini ayarla
+		int args_count = args_offset;
+
+		// Döngü ile metinleri tara
+		while (index < metin.length())
+		{
+			// Taranan metinde % karakteri var mý?
+			if (metin[index] == '%')
+			{
+				// Varsa index deðerini +1 olarak arttýr
+				index++;
+
+				// Taranan % karakteri var mý kontrol et, varsa karakteri % olarak ayarla ve bu indexi geç
+				if (metin[index] == '%')
+				{
+					metin[index] = '%';
+					continue;
+				}
+
+				// Integer
+				if (metin[index] == 'd' || metin[index] == 'i' || metin[index] == 'o' || metin[index] == 'x' || metin[index] == 'X' || metin[index] == 'u')
+				{
+					int yuzde = index - 1;
+
+					cell* deger = nullptr;
+					amx_GetAddr(amx, params[args_count++], &deger);
+
+					metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<int>(*deger)));
+				}
+
+				// Float
+				else if (metin[index] == 'f' || metin[index] == 'F' || metin[index] == 'a' || metin[index] == 'A' || metin[index] == 'g' || metin[index] == 'G')
+				{
+					int yuzde = index - 1;
+
+					cell* deger = nullptr;
+					amx_GetAddr(amx, params[args_count++], &deger);
+
+					metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<float>(amx_ctof(*deger))));
+				}
+
+				// String
+				else if (metin[index] == 's')
+				{
+					int yuzde = index - 1;
+					metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), getString(amx, params[args_count++])));
+				}
+
+				// Char
+				else if (metin[index] == 'c')
+				{
+					int yuzde = index - 1;
+
+					cell* deger = nullptr;
+					amx_GetAddr(amx, params[args_count++], &deger);
+
+					if (*deger == 0x25)
+					{
+						metin.replace(yuzde, index - yuzde + 1, "%%");
+					}
+					else
+					{
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<char>(*deger)));
+					}
+				}
+
+				// %02d, %02f vs..
+				else if (metin[index] >= '0' && metin[index] <= '9')
+				{
+					int yuzde = index - 1;
+
+					while (!isalpha(metin[index]))
+					{
+						index++;
+					}
+
+					if (metin[index] == 'd' || metin[index] == 'i' || metin[index] == 'o' || metin[index] == 'x' || metin[index] == 'X' || metin[index] == 'u')
+					{
+						cell* deger = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger);
+
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<int>(*deger)));
+					}
+					else if (metin[index] == 'f' || metin[index] == 'F' || metin[index] == 'a' || metin[index] == 'A' || metin[index] == 'g' || metin[index] == 'G')
+					{
+						cell* deger = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger);
+
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<float>(amx_ctof(*deger))));
+					}
+				}
+
+				// %.*s,  %.*f
+				else if (metin[index] == '.' && metin[index + 1] == '*')
+				{
+					int yuzde = index - 1;
+
+					while (!isalpha(metin[index]))
+					{
+						index++;
+					}
+
+					if (metin[index] == 's')
+					{
+						cell* deger = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger);
+
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<int>(*deger), getString(amx, params[args_count++])));
+					}
+
+					else if (metin[index] == 'f' || metin[index] == 'F' || metin[index] == 'a' || metin[index] == 'A' || metin[index] == 'g' || metin[index] == 'G')
+					{
+						cell* deger = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger);
+
+						cell* deger2 = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger2);
+
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<int>(*deger), static_cast<float>(amx_ctof(*deger2))));
+					}
+				}
+
+				// %.1s, %.1f
+				else if (metin[index] == '.' && metin[index + 1] != '*')
+				{
+					int yuzde = index - 1;
+
+					while (!isalpha(metin[index]))
+					{
+						index++;
+					}
+
+					if (metin[index] == 's')
+					{
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), getString(amx, params[args_count++])));
+					}
+
+					else if (metin[index] == 'f' || metin[index] == 'F' || metin[index] == 'a' || metin[index] == 'A' || metin[index] == 'g' || metin[index] == 'G')
+					{
+						cell* deger = nullptr;
+						amx_GetAddr(amx, params[args_count++], &deger);
+
+						metin.replace(yuzde, index - yuzde + 1, fmt::sprintf(metin.substr(yuzde, index - yuzde + 1), static_cast<float>(amx_ctof(*deger))));
+					}
+				}
+			}
+			index++;
+		}
+	}
+	return metin.c_str();
 }

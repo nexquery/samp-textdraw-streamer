@@ -18,11 +18,11 @@
 #include <sstream>
 #include "sampgdk.hpp"
 
-namespace Service
+namespace service
 {
-	void Native_SetInt(AMX* amx, cell output, int value);
-	void Native_SetFloat(AMX* amx, cell output, float value);
-	void Native_SetString(AMX* amx, cell output, cell size, std::string string);
-	std::string Native_GetString(AMX* amx, cell input);
-	char* FormatString(AMX* amx, cell* params, int32_t parm);
+	void setInt(AMX* amx, cell output, int value);
+	void setFloat(AMX* amx, cell output, float value);
+	void setString(AMX* amx, cell output, cell size, std::string string);
+	std::string getString(AMX* amx, cell input);
+	std::string formattedString(AMX* amx, cell* params, cell text_index, int32_t args_offset);
 };

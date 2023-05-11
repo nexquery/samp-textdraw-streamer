@@ -33,15 +33,12 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicTextDraw(AMX* amx, cell* params)
 	// Array Data'yý oluþtur
 	std::vector<int>* arr = new std::vector<int>();
 
-	// Service::Native_GetString(amx, params[3]);
-	// Service::FormatString(amx, params, 3);
-
 	// Textdraw verilerini oluþtur
 	Text_Data* data			= new Text_Data();
 	data->real_id			= -1;
 	data->create_x			= amx_ctof(params[1]);
 	data->create_y			= amx_ctof(params[2]);
-	data->text				= Service::Native_GetString(amx, params[3]);
+	data->text				= service::formattedString(amx, params, 3, 4);
 	data->lettersize_x		= 0.0;
 	data->lettersize_y		= 0.0;
 	data->textsize_x		= 0.0;
@@ -557,8 +554,7 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetString(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		// Service::FormatString(amx, params, 2);
-		it->second->text = Service::Native_GetString(amx, params[2]);
+		it->second->text = service::formattedString(amx, params, 2, 3);
 
 		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 		{
@@ -692,7 +688,7 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetString(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetString(amx, params[2], params[3], it->second->text.c_str());
+		service::setString(amx, params[2], params[3], it->second->text.c_str());
 	}
 	else
 	{
@@ -744,8 +740,8 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetLetterSize(AMX* amx, cell* param
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetFloat(amx, params[2], it->second->lettersize_x);
-		Service::Native_SetFloat(amx, params[3], it->second->lettersize_y);
+		service::setFloat(amx, params[2], it->second->lettersize_x);
+		service::setFloat(amx, params[3], it->second->lettersize_y);
 	}
 	else
 	{
@@ -764,8 +760,8 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetTextSize(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetFloat(amx, params[2], it->second->textsize_x);
-		Service::Native_SetFloat(amx, params[3], it->second->textsize_y);
+		service::setFloat(amx, params[2], it->second->textsize_x);
+		service::setFloat(amx, params[3], it->second->textsize_y);
 	}
 	else
 	{
@@ -784,8 +780,8 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPos(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetFloat(amx, params[2], it->second->create_x);
-		Service::Native_SetFloat(amx, params[3], it->second->create_y);
+		service::setFloat(amx, params[2], it->second->create_x);
+		service::setFloat(amx, params[3], it->second->create_y);
 	}
 	else
 	{
@@ -1002,10 +998,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewRot(AMX* amx, cell* param
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetFloat(amx, params[2], it->second->fRotX);
-		Service::Native_SetFloat(amx, params[3], it->second->fRotY);
-		Service::Native_SetFloat(amx, params[4], it->second->fRotZ);
-		Service::Native_SetFloat(amx, params[5], it->second->fZoom);
+		service::setFloat(amx, params[2], it->second->fRotX);
+		service::setFloat(amx, params[3], it->second->fRotY);
+		service::setFloat(amx, params[4], it->second->fRotZ);
+		service::setFloat(amx, params[5], it->second->fZoom);
 	}
 	else
 	{
@@ -1024,8 +1020,8 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewVehicleColours(AMX* amx, 
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetInt(amx, params[2], it->second->veh_col1);
-		Service::Native_SetInt(amx, params[3], it->second->veh_col2);
+		service::setInt(amx, params[2], it->second->veh_col1);
+		service::setInt(amx, params[3], it->second->veh_col2);
 	}
 	else
 	{
@@ -1044,7 +1040,7 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetRealID(AMX* amx, cell* params)
 	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
 	if (it != GlobalText::gText->end())
 	{
-		Service::Native_SetInt(amx, params[2], it->second->real_id);
+		service::setInt(amx, params[2], it->second->real_id);
 	}
 	else
 	{

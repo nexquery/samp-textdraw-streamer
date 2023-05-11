@@ -211,6 +211,15 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX *amx)
 {
+	cell address = 0;
+	if (!amx_FindPubVar(amx, "TDS_Enable_Log", &address))
+	{
+		cell* amxPhysAddr = NULL;
+		if (!amx_GetAddr(amx, address, &amxPhysAddr))
+		{
+			Plugin_Settings::logMode = static_cast<bool>(*amxPhysAddr);
+		}
+	}
 	gAmx.insert(amx);
 	return amx_Register(amx, NativeList, -1);
 }

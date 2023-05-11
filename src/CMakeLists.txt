@@ -11,9 +11,11 @@ include(AddSAMPPlugin)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/amx
+  ${CMAKE_CURRENT_SOURCE_DIR}/fmt
 )
 
 add_definitions(-DSAMPGDK_AMALGAMATION)
+add_definitions(-DFMT_HEADER_ONLY)
 
 add_samp_plugin(textdraw-streamer
 	amxplugin.cpp
