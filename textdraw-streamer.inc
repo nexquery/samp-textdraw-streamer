@@ -20,6 +20,23 @@
 #define _INC_textdraw_streamer
 
 /***
+ *    888                       
+ *    888                       
+ *    888                       
+ *    888      .d88b.   .d88b.  
+ *    888     d88""88b d88P"88b 
+ *    888     888  888 888  888 
+ *    888     Y88..88P Y88b 888 
+ *    88888888 "Y88P"   "Y88888 
+ *                          888 
+ *                     Y8b d88P 
+ *                      "Y88P"  
+ */
+
+public TDS_Enable_Log = true;
+#pragma unused TDS_Enable_Log
+
+/***
  *    88888888888                         
  *        888                             
  *        888                             
@@ -49,7 +66,7 @@
  */
 
 // General
-native Text:CreateDynamicTextDraw(Float:x, Float:y, const format[]);
+native Text:CreateDynamicTextDraw(Float:x, Float:y, const format[], {Float, _}:...);
 native DestroyDynamicTextDraw(Text:textid);
 native DynamicTextDrawLetterSize(Text:textid, Float:width, Float:height);
 native DynamicTextDrawTextSize(Text:textid, Float:width, Float:height);
@@ -67,7 +84,7 @@ native DynamicTextDrawShowForPlayer(playerid, Text:textid);
 native DynamicTextDrawHideForPlayer(playerid, Text:textid);
 native DynamicTextDrawShowForAll(Text:textid);
 native DynamicTextDrawHideForAll(Text:textid);
-native DynamicTextDrawSetString(Text:textid, const format[]);
+native DynamicTextDrawSetString(Text:textid, const format[], {Float, _}:...);
 native DynamicTextDrawSetPreviewModel(Text:textid, model);
 native DynamicTextDrawSetPreviewRot(Text:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0);
 native DynamicTextDrawSetPreviewVehCol(Text:textid, colour1, colour2);
@@ -115,7 +132,7 @@ native DynamicTextDrawGetSize();
  */
 
 // General
-native PlayerText:CreateDynamicPlayerTextDraw(playerid, Float:x, Float:y, const format[]);
+native PlayerText:CreateDynamicPlayerTextDraw(playerid, Float:x, Float:y, const format[], {Float, _}:...);
 native DestroyDynamicPlayerTextDraw(playerid, PlayerText:textid);
 native DynamicPlayerTextDrawLetterSize(playerid, PlayerText:textid, Float:width, Float:height);
 native DynamicPlayerTextDrawTextSize(playerid, PlayerText:textid, Float:width, Float:height);
@@ -131,7 +148,7 @@ native DynPlayerTextSetProportional(playerid, PlayerText:textid, proportional);
 native DynamicPlayerTextDrawSelectable(playerid, PlayerText:textid, selectable);
 native DynamicPlayerTextDrawShow(playerid, PlayerText:textid);
 native DynamicPlayerTextDrawHide(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawSetString(playerid, PlayerText:textid, const format[]);
+native DynamicPlayerTextDrawSetString(playerid, PlayerText:textid, const format[], {Float, _}:...);
 native DynamicPlayerTextDrawSetPrevMdl(playerid, PlayerText:textid, model);
 native DynamicPlayerTextDrawSetPrevRot(playerid, PlayerText:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0);
 native DynamicPlayerTextDrawPrevVehCol(playerid, PlayerText:textid, colour1, colour2);
