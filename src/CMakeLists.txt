@@ -20,8 +20,6 @@ add_definitions(-DFMT_HEADER_ONLY)
 add_samp_plugin(textdraw-streamer
 	amxplugin.cpp
 	compilation_date.hpp
-	format.cpp
-	format.hpp
 	main.cpp
 	natives.hpp
 	natives_data.cpp
