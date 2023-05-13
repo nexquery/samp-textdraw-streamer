@@ -295,6 +295,13 @@ PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickTextDraw(int playerid, int clickedid
 				amx_Push(*p, static_cast<cell>(playerid));
 				amx_Exec(*p, NULL, idx);
 			}
+			
+			if (!amx_FindPublic(*p, "OnClickDynamicTextDraw", &idx))
+			{
+				amx_Push(*p, static_cast<cell>(INVALID_TEXT_DRAW));
+				amx_Push(*p, static_cast<cell>(playerid));
+				amx_Exec(*p, NULL, idx);
+			}
 		}
 	}
 	else
