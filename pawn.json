@@ -1,6 +1,6 @@
 {
     "user": "nexquery",
-    "repo": "textdraw-streamer",
+    "repo": "samp-textdraw-streamer",
     "resources": [
         {
             "name": "^textdraw-streamer.(.*).zip$",
