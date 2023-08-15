@@ -1,5 +1,5 @@
 {
-    "user": "nexquery",
+    "user": "flamesidgs",
     "repo": "samp-textdraw-streamer",
     "resources": [
         {
@@ -18,6 +18,6 @@
         }
     ],
     "runtime": {
-        "plugins": ["nexquery/samp-textdraw-streamer"]
+        "plugins": ["flamesidgs/samp-textdraw-streamer"]
     }
 }
