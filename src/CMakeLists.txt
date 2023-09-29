@@ -25,6 +25,7 @@ add_samp_plugin(textdraw-streamer
 	natives_data.cpp
 	natives_global.cpp
 	natives_player.cpp
+	natives_plugin.cpp
 	plugin.h
 	plugin_version.hpp
 	plugincommon.h

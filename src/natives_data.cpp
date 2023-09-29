@@ -18,185 +18,159 @@
 #include "natives.hpp"
 #include "service.hpp"
 
-bool Plugin_Settings::logMode = true;
-
+ //
+ // native DynamicTextDraw_SetIntData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, index, value, playerid = -1);
+ //
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
-	int type = params[1], textid = params[2], index	= params[3], value = params[4], playerid = params[5], ret = 0;
-	switch (type)
+	
+	int
+		type		= params[1],
+		textid		= params[2],
+		index		= params[3],
+		value		= params[4],
+		playerid	= params[5];
+	
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				std::map<int, int>* address = it->second->extra_id;
-				(*address)[index] = value;
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		std::map<int, int>* address = it->second->extra_id;
+		(*address)[index] = value;
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					std::map<int, int>* address = it->second->extra_id;
-					(*address)[index] = value;
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
-		}
 
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
+			std::map<int, int>* address = it->second->extra_id;
+			(*address)[index] = value;
+			return 1;
 		}
 	}
-	return static_cast<cell>(ret);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+
+	return 0;
 }
 
+//
+// native DynamicTextDraw_GetIntData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, index, playerid = -1);
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
-	int type = params[1], textid = params[2], index = params[3], playerid = params[4], value = 0;
-	switch (type)
+	
+	int
+		type		= params[1],
+		textid		= params[2],
+		index		= params[3],
+		playerid	= params[4];
+	
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				std::map<int, int>* address = (std::map<int, int>*)it->second->extra_id;
-				value = (*address)[index];
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		std::map<int, int>* address = (std::map<int, int>*)it->second->extra_id;
+		return (*address)[index];
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					std::map<int, int>* address = it->second->extra_id;
-					value = (*address)[index];
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
-		}
 
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
+			std::map<int, int>* address = it->second->extra_id;
+			return (*address)[index];
 		}
 	}
-	return static_cast<int>(value);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+
+	return 0;
 }
 
+//
+// native DynamicTextDraw_ClearIntData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, playerid = -1);
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_ClearIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
-	int type = params[1], textid = params[2], playerid = params[3], ret = 0;
-	switch (type)
+	
+	int
+		type		= params[1],
+		textid		= params[2],
+		playerid	= params[3];
+
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				delete it->second->extra_id;
-				std::map<int, int>* address = new std::map<int, int>();
-				it->second->extra_id = address;
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		delete it->second->extra_id;
+		std::map<int, int>* address = new std::map<int, int>();
+		it->second->extra_id = address;
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					delete it->second->extra_id;
-					std::map<int, int>* address = new std::map<int, int>();
-					it->second->extra_id = address;
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
-		}
 
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
+			delete it->second->extra_id;
+			std::map<int, int>* address = new std::map<int, int>();
+			it->second->extra_id = address;
+			return 1;
 		}
 	}
-	return static_cast<cell>(ret);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+
+	return 0;
 }
 
+//
+// native DynamicTextDraw_SetFloatData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, Float:value, playerid = -1);
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetFloatData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
@@ -205,61 +179,45 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetFloatData(AMX* amx, cell* param
 	int		textid		= params[2];
 	float	value		= amx_ctof(params[3]);
 	int		playerid	= params[4];
-	int		ret			= 0;
 
-	switch (type)
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				it->second->float_data = value;
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		it->second->float_data = value;
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					it->second->float_data = value;
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
-		}
 
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
+			it->second->float_data = value;
+			return 1;
 		}
 	}
-	return 1;
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+
+	return 0;
 }
 
+//
+// native Float:DynamicTextDraw_GetFloatData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, playerid = -1);
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetFloatData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
@@ -269,57 +227,39 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetFloatData(AMX* amx, cell* param
 	int		playerid	= params[3];
 	float	value		= 0.0;
 
-	switch (type)
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				value = it->second->float_data;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return amx_ftoc(value);
 		}
-
-		case TDStreamer_Type::PLAYER:
+		return amx_ftoc(it->second->float_data);
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					value = it->second->float_data;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return amx_ftoc(value);
 			}
-			break;
+			return amx_ftoc(it->second->float_data);
 		}
-
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
-		}
+	}
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
 	}
 	return amx_ftoc(value);
 }
 
+//
+// native DynamicTextDraw_SetArrayData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, const src[], playerid = -1, maxSrc = sizeof(src));
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetArrayData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
@@ -327,73 +267,58 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetArrayData(AMX* amx, cell* param
 	int	type		= params[1];
 	int	textid		= params[2];
 	int	playerid	= params[4];
-	int ret			= 0;
 
-	switch (type)
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				cell* array = NULL;
-				amx_GetAddr(amx, params[3], &array);
-				it->second->array_data->clear();
-				for (int i = 0; i < static_cast<int>(params[5]); ++i)
-				{
-					it->second->array_data->push_back(static_cast<int>(array[i]));
-				}
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
-		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
-			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					cell* array = NULL;
-					amx_GetAddr(amx, params[3], &array);
-					it->second->array_data->clear();
-					for (int i = 0; i < static_cast<int>(params[5]); ++i)
-					{
-						it->second->array_data->push_back(static_cast<int>(array[i]));
-					}
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
-			}
-			break;
-		}
+		it->second->array_data->clear();
 
-		default:
+		cell* array = NULL;
+		amx_GetAddr(amx, params[3], &array);
+		for (int i = 0, j = static_cast<int>(params[5]); i != j; ++i)
 		{
-			if (Plugin_Settings::logMode)
+			it->second->array_data->push_back(static_cast<int>(array[i]));
+		}
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
+		{
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
+			
+			it->second->array_data->clear();
+
+			cell* array = NULL;
+			amx_GetAddr(amx, params[3], &array);
+			for (int i = 0, j = static_cast<int>(params[5]); i != j; ++i)
+			{
+				it->second->array_data->push_back(static_cast<int>(array[i]));
+			}
+			return 1;
 		}
 	}
-	return static_cast<cell>(ret);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+	return 0;
 }
 
+//
+// native DynamicTextDraw_GetArrayData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, const dest[], playerid = -1, maxDest = sizeof(dest));
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetArrayData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
@@ -401,157 +326,108 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetArrayData(AMX* amx, cell* param
 	int	type = params[1];
 	int	textid = params[2];
 	int	playerid = params[4];
-	int ret = 0;
 
-	switch (type)
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				// Index
-				int index = 0;
-
-				// Array adresi
-				cell* array = NULL;
-				amx_GetAddr(amx, params[3], &array);
-
-				// Veriyi yaz
-				for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
-				{
-					if (index == static_cast<int>(params[5]))
-					{
-						break;
-					}
-					array[index++] = static_cast<cell>(*data);
-				}
-
-				// Basarili
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		int index = 0;
+		cell* array = NULL;
+		amx_GetAddr(amx, params[3], &array);
+
+		for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			if (index == static_cast<int>(params[5]))
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					// Index
-					int index = 0;
-
-					// Array adresi
-					cell* array = NULL;
-					amx_GetAddr(amx, params[3], &array);
-
-					// Veriyi yaz
-					for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
-					{
-						if (index == static_cast<int>(params[5]))
-						{
-							break;
-						}
-						array[index++] = static_cast<cell>(*data);
-					}
-
-					// Basarili
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				break;
 			}
-			break;
+			array[index++] = static_cast<cell>(*data);
 		}
-
-		default:
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (Plugin_Settings::logMode)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
+
+			int index = 0;
+			cell* array = NULL;
+			amx_GetAddr(amx, params[3], &array);
+
+			for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
+			{
+				if (index == static_cast<int>(params[5]))
+				{
+					break;
+				}
+				array[index++] = static_cast<cell>(*data);
+			}
+			return 1;
 		}
 	}
-	return static_cast<cell>(ret);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+	return 0;
 }
 
+//
+// native DynamicTextDraw_ClearArrayData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, playerid = -1);
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_ClearArrayData(AMX* amx, cell* params)
 {
-	CHECK_PARAMS(5);
+	CHECK_PARAMS(3);
 
 	int	type = params[1];
 	int	textid = params[2];
-	int	playerid = params[5];
-	int ret = 0;
+	int	playerid = params[3];
 
-	switch (type)
+	if (type == TDStreamer_Type::GLOBAL)
 	{
-		case TDStreamer_Type::GLOBAL:
+		auto it = GlobalText::gText->find(textid);
+		if (it == GlobalText::gText->end())
 		{
-			auto it = GlobalText::gText->find(textid);
-			if (it != GlobalText::gText->end())
-			{
-				delete it->second->array_data;
-				std::vector<int>* arr = new std::vector<int>();
-				it->second->array_data = arr;
-				ret = 1;
-			}
-			else
-			{
-				if (Plugin_Settings::logMode)
-				{
-					sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. ID: %d", __func__, textid);
-				}
-			}
-			break;
+			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
 		}
 
-		case TDStreamer_Type::PLAYER:
+		delete it->second->array_data;
+		std::vector<int>* arr = new std::vector<int>();
+		it->second->array_data = arr;
+		return 1;
+	}
+	else if (type == TDStreamer_Type::PLAYER)
+	{
+		if (playerid >= 0 && playerid < MAX_PLAYERS)
 		{
-			if (playerid >= 0 && playerid < MAX_PLAYERS)
+			auto it = PlayerText::pText[playerid]->find(textid);
+			if (it == PlayerText::pText[playerid]->end())
 			{
-				auto it = PlayerText::pText[playerid]->find(textid);
-				if (it != PlayerText::pText[playerid]->end())
-				{
-					delete it->second->array_data;
-					std::vector<int>* arr = new std::vector<int>();
-					it->second->array_data = arr;
-					ret = 1;
-				}
-				else
-				{
-					if (Plugin_Settings::logMode)
-					{
-						sampgdk::logprintf("[textdraw.streamer] %s: An item for this ID could not be found. TextID: %d, PlayerID: %d", __func__, textid, playerid);
-					}
-				}
+				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+				return 0;
 			}
-			break;
-		}
 
-		default:
-		{
-			if (Plugin_Settings::logMode)
-			{
-				sampgdk::logprintf("[textdraw.streamer] %s: Type format is invalid.", __func__);
-			}
-			break;
+			delete it->second->array_data;
+			std::vector<int>* arr = new std::vector<int>();
+			it->second->array_data = arr;
+			return 1;
 		}
 	}
-	return static_cast<cell>(ret);
+	else
+	{
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	}
+	return 0;
 }

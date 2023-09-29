@@ -138,7 +138,6 @@ void GlobalText::Reload(std::unordered_map<int, Text_Data*>::iterator it)
 	}
 }
 
-
  /***
   *    8888888b.  888
   *    888   Y88b 888

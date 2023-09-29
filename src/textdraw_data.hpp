@@ -30,6 +30,20 @@ enum TDStreamer_Type
 	PLAYER
 };
 
+enum LogType
+{
+	// Player
+	CREATE_PLAYER_TEXTDRAW,
+	FIND_PLAYER_TEXT,
+	SHOW_LIMIT_PLAYER,
+
+	// Global
+	FIND_GLOBAL_TEXT,
+
+	// Data
+	INVALID_TYPE,
+};
+
 struct DefaultText
 {
 	float		lettersize_x	= 0.0;
@@ -87,6 +101,15 @@ struct Text_Data
 	std::vector<int>*	array_data{};
 };
 
+class Plugin_Settings
+{
+public:
+	static bool logMode;
+	static std::string file;
+	static int line;
+	static void ILogger(LogType type, std::string funcs, int playerid, int textid);
+};
+
 class PlayerText
 {
 public:
@@ -105,10 +128,4 @@ public:
 	static std::map<int, std::map<int, bool>> gTextVisible;
 	static void Destroy();
 	static void Reload(std::unordered_map<int, Text_Data*>::iterator it);
-};
-
-class Plugin_Settings
-{
-public:
-	static bool logMode;
 };

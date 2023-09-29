@@ -57,10 +57,10 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 		sampgdk::logprintf(" |                               |");
 		sampgdk::logprintf(" |  Discord:                     |");
 		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Nexor#4730                   |");
+		sampgdk::logprintf(" |  benburakya - Nexor#4730      |");
 		sampgdk::logprintf(" |                               |");
 		sampgdk::logprintf(" =================================");
-		sampgdk::logprintf("");
+		sampgdk::logprintf("");	
 	}
 	return load;
 }
@@ -92,7 +92,7 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 		sampgdk::logprintf(" |                               |");
 		sampgdk::logprintf(" |  Discord:                     |");
 		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Nexor#4730                   |");
+		sampgdk::logprintf(" |  benburakya - Nexor#4730      |");
 		sampgdk::logprintf(" |                               |");
 		sampgdk::logprintf(" =================================");
 		sampgdk::logprintf("");
@@ -124,6 +124,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicTextDrawSetPreviewModel",					Natives::DynamicTextDrawSetPreviewModel},
 	{"DynamicTextDrawSetPreviewRot",					Natives::DynamicTextDrawSetPreviewRot},
 	{"DynamicTextDrawSetPreviewVehCol",					Natives::DynamicTextDrawSetPreviewVehicleColours},
+	
 	{"IsValidDynamicTextDraw",							Natives::IsValidDynamicTextDraw},
 	{"IsDynTextDrawVisibleForPlayer",					Natives::IsDynamicTextDrawVisibleForPlayer},
 	{"DynamicTextDrawGetString",						Natives::DynamicTextDrawGetString},
@@ -133,7 +134,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicTextDrawGetPos",							Natives::DynamicTextDrawGetPos},
 	{"DynamicTextDrawGetColour",						Natives::DynamicTextDrawGetColour},
 	{"DynamicTextDrawGetBoxColour",						Natives::DynamicTextDrawGetBoxColour},
-	{"DynamicTextDrawGetBackgroundCol",					Natives::DynamicTextDrawGetBackgroundColour},
+	{"DynamicTextDrawGetBackgroundCo",					Natives::DynamicTextDrawGetBackgroundColour},
 	{"DynamicTextDrawGetShadow",						Natives::DynamicTextDrawGetShadow},
 	{"DynamicTextDrawGetOutline",						Natives::DynamicTextDrawGetOutline},
 	{"DynamicTextDrawGetFont",							Natives::DynamicTextDrawGetFont},
@@ -143,7 +144,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicTextDrawGetAlignment",						Natives::DynamicTextDrawGetAlignment},
 	{"DynamicTextDrawGetPreviewModel",					Natives::DynamicTextDrawGetPreviewModel},
 	{"DynamicTextDrawGetPreviewRot",					Natives::DynamicTextDrawGetPreviewRot},
-	{"DynamicTextDrawGetPreviewVehCol",					Natives::DynamicTextDrawGetPreviewVehicleColours},
+	{"DynamicTextDrawGetPreviewVehCo",					Natives::DynamicTextDrawGetPreviewVehicleColours},
 	{"DynamicTextDrawGetRealID",						Natives::DynamicTextDrawGetRealID},
 	{"DynamicTextDrawGetSize",							Natives::DynamicTextDrawGetSize},
 
@@ -168,6 +169,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicPlayerTextDrawSetPrevMdl",					Natives::DynamicPlayerTextDrawSetPreviewModel},
 	{"DynamicPlayerTextDrawSetPrevRot",					Natives::DynamicPlayerTextDrawSetPreviewRot},
 	{"DynamicPlayerTextDrawPrevVehCol",					Natives::DynamicPlayerTextDrawSetPreviewVehicleColours},
+	
 	{"IsValidDynamicPlayerTextDraw",					Natives::IsValidDynamicPlayerTextDraw},
 	{"IsDynamicPlayerTextDrawVisible",					Natives::IsDynamicPlayerTextDrawVisible},
 	{"DynamicPlayerTextDrawGetString",					Natives::DynamicPlayerTextDrawGetString},
@@ -204,6 +206,9 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{ "DynamicTextDraw_SetArrayData",					Natives::DynamicTextDraw_SetArrayData},
 	{ "DynamicTextDraw_GetArrayData",					Natives::DynamicTextDraw_GetArrayData},
 	{ "DynamicTextDraw_ClearArrayData",					Natives::DynamicTextDraw_ClearArrayData},
+
+	// Logger
+	{ "TDLogger__",										Natives::TDLogger },
 
 	// NULL
 	{NULL, NULL}

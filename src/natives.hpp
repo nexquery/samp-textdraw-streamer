@@ -130,4 +130,7 @@ namespace Natives
 	cell AMX_NATIVE_CALL DynamicTextDraw_SetArrayData(AMX* amx, cell* params);
 	cell AMX_NATIVE_CALL DynamicTextDraw_GetArrayData(AMX* amx, cell* params);
 	cell AMX_NATIVE_CALL DynamicTextDraw_ClearArrayData(AMX* amx, cell* params);
+
+	// Logger
+	cell AMX_NATIVE_CALL TDLogger(AMX* amx, cell* params);
 };
