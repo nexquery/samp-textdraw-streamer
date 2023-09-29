@@ -67,52 +67,52 @@ public TDS_Enable_Log = true;
 
 // General
 native Text:CreateDynamicTextDraw(Float:x, Float:y, const format[], {Float, _}:...);
-native DestroyDynamicTextDraw(Text:textid);
-native DynamicTextDrawLetterSize(Text:textid, Float:width, Float:height);
-native DynamicTextDrawTextSize(Text:textid, Float:width, Float:height);
-native DynamicTextDrawAlignment(Text:textid, alignment);
-native DynamicTextDrawColour(Text:textid, textColour);
-native DynamicTextDrawUseBox(Text:textid, enableBox);
-native DynamicTextDrawBoxColour(Text:textid, boxColour);
-native DynamicTextDrawSetShadow(Text:textid, shadowSize);
-native DynamicTextDrawSetOutline(Text:textid, outlineSize);
-native DynamicTextDrawBackgroundColour(Text:textid, backgroundColour);
-native DynamicTextDrawFont(Text:textid, font);
-native DynamicTextDrawSetProportional(Text:textid, proportional);
-native DynamicTextDrawSetSelectable(Text:textid, selectable);
-native DynamicTextDrawShowForPlayer(playerid, Text:textid);
-native DynamicTextDrawHideForPlayer(playerid, Text:textid);
-native DynamicTextDrawShowForAll(Text:textid);
-native DynamicTextDrawHideForAll(Text:textid);
+native DestroyDynamicTextDraw(Text:textid, const file[], line);
+native DynamicTextDrawLetterSize(Text:textid, Float:width, Float:height, const file[], line);
+native DynamicTextDrawTextSize(Text:textid, Float:width, Float:height, const file[], line);
+native DynamicTextDrawAlignment(Text:textid, alignment, const file[], line);
+native DynamicTextDrawColour(Text:textid, textColour, const file[], line);
+native DynamicTextDrawUseBox(Text:textid, enableBox, const file[], line);
+native DynamicTextDrawBoxColour(Text:textid, boxColour, const file[], line);
+native DynamicTextDrawSetShadow(Text:textid, shadowSize, const file[], line);
+native DynamicTextDrawSetOutline(Text:textid, outlineSize, const file[], line);
+native DynamicTextDrawBackgroundColour(Text:textid, backgroundColour, const file[], line);
+native DynamicTextDrawFont(Text:textid, font, const file[], line);
+native DynamicTextDrawSetProportional(Text:textid, proportional, const file[], line);
+native DynamicTextDrawSetSelectable(Text:textid, selectable, const file[], line);
+native DynamicTextDrawShowForPlayer(playerid, Text:textid, const file[], line);
+native DynamicTextDrawHideForPlayer(playerid, Text:textid, const file[], line);
+native DynamicTextDrawShowForAll(Text:textid, const file[], line);
+native DynamicTextDrawHideForAll(Text:textid, const file[], line);
 native DynamicTextDrawSetString(Text:textid, const format[], {Float, _}:...);
-native DynamicTextDrawSetPreviewModel(Text:textid, model);
-native DynamicTextDrawSetPreviewRot(Text:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0);
-native DynamicTextDrawSetPreviewVehCol(Text:textid, colour1, colour2);
+native DynamicTextDrawSetPreviewModel(Text:textid, model, const file[], line);
+native DynamicTextDrawSetPreviewRot(Text:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0, const file[], line);
+native DynamicTextDrawSetPreviewVehCol(Text:textid, colour1, colour2, const file[], line);
 
 // YSF Functions (names changed to avoid open.mp conflicts)
 native IsValidDynamicTextDraw(Text:textid);
-native IsDynTextDrawVisibleForPlayer(playerid, Text:textid);
+native IsDynTextDrawVisibleForPlayer_(playerid, Text:textid, const file[], line) = IsDynTextDrawVisibleForPlayer;
 native DynamicTextDrawGetString(Text:textid, string[], stringSize = sizeof(string));
-native DynamicTextDrawSetPos(Text:textid, Float:x, Float:y);
-native DynamicTextDrawGetLetterSize(Text:textid, &Float:width, &Float:height);
-native DynamicTextDrawGetTextSize(Text:textid, &Float:width, &Float:height);
-native DynamicTextDrawGetPos(Text:textid, &Float:x, &Float:y);
-native DynamicTextDrawGetColour(Text:textid);
-native DynamicTextDrawGetBoxColour(Text:textid);
-native DynamicTextDrawGetBackgroundCol(Text:textid);
-native DynamicTextDrawGetShadow(Text:textid);
-native DynamicTextDrawGetOutline(Text:textid);
-native DynamicTextDrawGetFont(Text:textid);
-native DynamicTextDrawIsBox(Text:textid);
-native DynamicTextDrawIsProportional(Text:textid);
-native DynamicTextDrawIsSelectable(Text:textid);
-native DynamicTextDrawGetAlignment(Text:textid);
-native DynamicTextDrawGetPreviewModel(Text:textid);
-native DynamicTextDrawGetPreviewRot(Text:textid, &Float:rotationX, &Float:rotationY, &Float:rotationZ, &Float:zoom);
-native DynamicTextDrawGetPreviewVehCol(Text:textid, &colour1, &colour2);
+native DynamicTextDrawSetPos_(Text:textid, Float:x, Float:y, const file[], line) = DynamicTextDrawSetPos;
+native DynamicTextDrawGetLetterSize_(Text:textid, &Float:width, &Float:height, const file[], line) = DynamicTextDrawGetLetterSize;
+native DynamicTextDrawGetTextSize_(Text:textid, &Float:width, &Float:height, const file[], line) = DynamicTextDrawGetTextSize;
+native DynamicTextDrawGetPos_(Text:textid, &Float:x, &Float:y, const file[], line) = DynamicTextDrawGetPos;
+native DynamicTextDrawGetColour_(Text:textid, const file[], line) = DynamicTextDrawGetColour;
+native DynamicTextDrawGetBoxColour_(Text:textid, const file[], line) = DynamicTextDrawGetBoxColour;
+native DynamicTextDrawGetBackgroundCo(Text:textid, const file[], line);
+native DynamicTextDrawGetShadow_(Text:textid, const file[], line) = DynamicTextDrawGetShadow;
+native DynamicTextDrawGetOutline_(Text:textid, const file[], line) = DynamicTextDrawGetOutline;
+native DynamicTextDrawGetFont_(Text:textid, const file[], line) = DynamicTextDrawGetFont;
+native DynamicTextDrawIsBox_(Text:textid, const file[], line) = DynamicTextDrawIsBox;
+native DynamicTextDrawIsProportional_(Text:textid, const file[], line) = DynamicTextDrawIsProportional;
+native DynamicTextDrawIsSelectable_(Text:textid, const file[], line) = DynamicTextDrawIsSelectable;
+native DynamicTextDrawGetAlignment_(Text:textid, const file[], line) = DynamicTextDrawGetAlignment;
+native DynamicTextDrawGetPreviewModel_(Text:textid, const file[], line) = DynamicTextDrawGetPreviewModel;
+native DynamicTextDrawGetPreviewRot_(Text:textid, &Float:rotationX, &Float:rotationY, &Float:rotationZ, &Float:zoom, const file[], line) = DynamicTextDrawGetPreviewRot;
+native DynamicTextDrawGetPreviewVehCo(Text:textid, &colour1, &colour2, const file[], line);
 
 // Get the real textdraw id shown
-native DynamicTextDrawGetRealID(Text:textid, &Text:realid);
+native DynamicTextDrawGetRealID_(Text:textid, &Text:realid, const file[], line) = DynamicTextDrawGetRealID;
 
 // Get the total number of textdraws
 native DynamicTextDrawGetSize();
@@ -133,50 +133,50 @@ native DynamicTextDrawGetSize();
 
 // General
 native PlayerText:CreateDynamicPlayerTextDraw(playerid, Float:x, Float:y, const format[], {Float, _}:...);
-native DestroyDynamicPlayerTextDraw(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawLetterSize(playerid, PlayerText:textid, Float:width, Float:height);
-native DynamicPlayerTextDrawTextSize(playerid, PlayerText:textid, Float:width, Float:height);
-native DynamicPlayerTextDrawAlignment(playerid, PlayerText:textid, alignment);
-native DynamicPlayerTextDrawColour(playerid, PlayerText:textid, textColour);
-native DynamicPlayerTextDrawUseBox(playerid, PlayerText:textid, enableBox);
-native DynamicPlayerTextDrawBoxColor(playerid, PlayerText:textid, boxColour);
-native DynamicPlayerTextDrawSetShadow(playerid, PlayerText:textid, shadowSize);
-native DynamicPlayerTextDrawSetOutline(playerid, PlayerText:textid, outlineSize);
-native DynamicPlayerTextDrawBGColour(playerid, PlayerText:textid, backgroundColour);
-native DynamicPlayerTextDrawFont(playerid, PlayerText:textid, font);
-native DynPlayerTextSetProportional(playerid, PlayerText:textid, proportional);
-native DynamicPlayerTextDrawSelectable(playerid, PlayerText:textid, selectable);
-native DynamicPlayerTextDrawShow(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawHide(playerid, PlayerText:textid);
+native DestroyDynamicPlayerTextDraw(playerid, PlayerText:textid, const file[], line);
+native DynamicPlayerTextDrawLetterSize(playerid, PlayerText:textid, Float:width, Float:height, const file[], line);
+native DynamicPlayerTextDrawTextSize(playerid, PlayerText:textid, Float:width, Float:height, const file[], line);
+native DynamicPlayerTextDrawAlignment(playerid, PlayerText:textid, alignment, const file[], line);
+native DynamicPlayerTextDrawColour(playerid, PlayerText:textid, textColour, const file[], line);
+native DynamicPlayerTextDrawUseBox(playerid, PlayerText:textid, enableBox, const file[], line);
+native DynamicPlayerTextDrawBoxColor(playerid, PlayerText:textid, boxColour, const file[], line);
+native DynamicPlayerTextDrawSetShadow(playerid, PlayerText:textid, shadowSize, const file[], line);
+native DynamicPlayerTextDrawSetOutline(playerid, PlayerText:textid, outlineSize, const file[], line);
+native DynamicPlayerTextDrawBGColour(playerid, PlayerText:textid, backgroundColour, const file[], line);
+native DynamicPlayerTextDrawFont(playerid, PlayerText:textid, font, const file[], line);
+native DynPlayerTextSetProportional(playerid, PlayerText:textid, proportional, const file[], line);
+native DynamicPlayerTextDrawSelectable(playerid, PlayerText:textid, selectable, const file[], line);
+native DynamicPlayerTextDrawShow(playerid, PlayerText:textid, const file[], line);
+native DynamicPlayerTextDrawHide(playerid, PlayerText:textid, const file[], line);
 native DynamicPlayerTextDrawSetString(playerid, PlayerText:textid, const format[], {Float, _}:...);
-native DynamicPlayerTextDrawSetPrevMdl(playerid, PlayerText:textid, model);
-native DynamicPlayerTextDrawSetPrevRot(playerid, PlayerText:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0);
-native DynamicPlayerTextDrawPrevVehCol(playerid, PlayerText:textid, colour1, colour2);
+native DynamicPlayerTextDrawSetPrevMdl(playerid, PlayerText:textid, model, const file[], line);
+native DynamicPlayerTextDrawSetPrevRot(playerid, PlayerText:textid, Float:rotationX, Float:rotationY, Float:rotationZ, Float:zoom = 1.0, const file[], line);
+native DynamicPlayerTextDrawPrevVehCol(playerid, PlayerText:textid, colour1, colour2, const file[], line);
 
 // YSF Functions (names changed to avoid open.mp conflicts)
 native IsValidDynamicPlayerTextDraw(playerid, PlayerText:textid);
-native IsDynamicPlayerTextDrawVisible(playerid, PlayerText:textid);
+native IsDynamicPlayerTextDrawVisible_(playerid, PlayerText:textid, const file[], line) = IsDynamicPlayerTextDrawVisible;
 native DynamicPlayerTextDrawGetString(playerid, PlayerText:textid, string[], stringSize = sizeof(string));
-native DynamicPlayerTextDrawSetPos(playerid, PlayerText:textid, Float:x, Float:y);
-native DynPlayerTextDrawGetLetterSize(playerid, PlayerText:textid, &Float:width, &Float:height);
-native DynPlayerTextDrawGetTextSize(playerid, PlayerText:textid, &Float:width, &Float:height);
-native DynamicPlayerTextDrawGetPos(playerid, PlayerText:textid, &Float:x, &Float:y);
-native DynamicPlayerTextDrawGetColour(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawGetBoxCol(playerid, PlayerText:textid);
-native DynPlayerTextDrawGetBGColour(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawGetShadow(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawGetOutline(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawGetFont(playerid, PlayerText:textid);
-native DynamicPlayerTextDrawIsBox(playerid, PlayerText:textid);
-native DynPlayerTextDrawIsProportional(playerid, PlayerText:textid);
-native DynPlayerTextDrawIsSelectable(playerid, PlayerText:textid);
-native DynPlayerTextDrawGetAlignment(playerid, PlayerText:textid);
-native DynPlayerTextDrawGetPreviewMdl(playerid, PlayerText:textid);
-native DynPlayerTextDrawGetPreviewRot(playerid, PlayerText:textid, &Float:rotationX, &Float:rotationY, &Float:rotationZ, &Float:zoom);
-native DynPlayerTextDrawGetPrevVehCol(playerid, PlayerText:textid, &colour1, &colour2);
+native DynamicPlayerTextDrawSetPos_(playerid, PlayerText:textid, Float:x, Float:y, const file[], line) = DynamicPlayerTextDrawSetPos;
+native DynPlayerTextDrawGetLetterSize_(playerid, PlayerText:textid, &Float:width, &Float:height, const file[], line) = DynPlayerTextDrawGetLetterSize;
+native DynPlayerTextDrawGetTextSize_(playerid, PlayerText:textid, &Float:width, &Float:height, const file[], line) = DynPlayerTextDrawGetTextSize;
+native DynamicPlayerTextDrawGetPos_(playerid, PlayerText:textid, &Float:x, &Float:y, const file[], line) = DynamicPlayerTextDrawGetPos;
+native DynamicPlayerTextDrawGetColour_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawGetColour;
+native DynamicPlayerTextDrawGetBoxCol_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawGetBoxCol;
+native DynPlayerTextDrawGetBGColour_(playerid, PlayerText:textid, const file[], line) = DynPlayerTextDrawGetBGColour;
+native DynamicPlayerTextDrawGetShadow_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawGetShadow;
+native DynamicPlayerTextDrawGetOutlin_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawGetOutline;
+native DynamicPlayerTextDrawGetFont_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawGetFont;
+native DynamicPlayerTextDrawIsBox_(playerid, PlayerText:textid, const file[], line) = DynamicPlayerTextDrawIsBox;
+native DynPlayerTextDrawIsProportiona_(playerid, PlayerText:textid, const file[], line) = DynPlayerTextDrawIsProportional;
+native DynPlayerTextDrawIsSelectable_(playerid, PlayerText:textid, const file[], line) = DynPlayerTextDrawIsSelectable;
+native DynPlayerTextDrawGetAlignment_(playerid, PlayerText:textid, const file[], line) = DynPlayerTextDrawGetAlignment;
+native DynPlayerTextDrawGetPreviewMdl_(playerid, PlayerText:textid, const file[], line) = DynPlayerTextDrawGetPreviewMdl;
+native DynPlayerTextDrawGetPreviewRot_(playerid, PlayerText:textid, &Float:rotationX, &Float:rotationY, &Float:rotationZ, &Float:zoom, const file[], line) = DynPlayerTextDrawGetPreviewRot;
+native DynPlayerTextDrawGetPrevVehCol_(playerid, PlayerText:textid, &colour1, &colour2, const file[], line) = DynPlayerTextDrawGetPrevVehCol;
 
 // Get the real textdraw id shown
-native PlayerTextDrawGetRealID(playerid, PlayerText:text, &PlayerText:realid);
+native PlayerTextDrawGetRealID_(playerid, PlayerText:text, &PlayerText:realid, const file[], line) = PlayerTextDrawGetRealID;
 
 // Total number of textdraws created for the player
 native PlayerTextDrawGetSize(playerid);
@@ -253,28 +253,28 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawDestroy
 #endif
-#define TextDrawDestroy DestroyDynamicTextDraw
+#define TextDrawDestroy(%0) DestroyDynamicTextDraw(%0, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawLetterSize
 	#undef TextDrawLetterSize
 #else
 	#define _ALS_TextDrawLetterSize
 #endif
-#define TextDrawLetterSize DynamicTextDrawLetterSize
+#define TextDrawLetterSize(%0,%1,%2) DynamicTextDrawLetterSize(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawTextSize
 	#undef TextDrawTextSize
 #else
 	#define _ALS_TextDrawTextSize
 #endif
-#define TextDrawTextSize DynamicTextDrawTextSize
+#define TextDrawTextSize(%0,%1,%2) DynamicTextDrawTextSize(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawAlignment
 	#undef TextDrawAlignment
 #else
 	#define _ALS_TextDrawAlignment
 #endif
-#define TextDrawAlignment DynamicTextDrawAlignment
+#define TextDrawAlignment(%0,%1) DynamicTextDrawAlignment(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_TextDrawColour
@@ -282,14 +282,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_TextDrawColour
 	#endif
-	#define TextDrawColour DynamicTextDrawColour
+	#define TextDrawColour(%0,%1) DynamicTextDrawColour(%0, %1, __file, __line)
 #else
 	#if defined _ALS_TextDrawColor
 		#undef TextDrawColor
 	#else
 		#define _ALS_TextDrawColor
 	#endif
-	#define TextDrawColor DynamicTextDrawColour
+	#define TextDrawColor(%0,%1) DynamicTextDrawColour(%0, %1, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_TextDrawUseBox
@@ -297,7 +297,7 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawUseBox
 #endif
-#define TextDrawUseBox DynamicTextDrawUseBox
+#define TextDrawUseBox(%0,%1) DynamicTextDrawUseBox(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_TextDrawBoxColour
@@ -305,14 +305,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_TextDrawBoxColour
 	#endif
-	#define TextDrawBoxColour DynamicTextDrawBoxColour
+	#define TextDrawBoxColour(%0,%1) DynamicTextDrawBoxColour(%0, %1, __file, __line)
 #else
 	#if defined _ALS_TextDrawBoxColor
 		#undef TextDrawBoxColor
 	#else
 		#define _ALS_TextDrawBoxColor
 	#endif
-	#define TextDrawBoxColor DynamicTextDrawBoxColour
+	#define TextDrawBoxColor(%0,%1) DynamicTextDrawBoxColour(%0, %1, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetShadow
@@ -320,14 +320,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawSetShadow
 #endif
-#define TextDrawSetShadow DynamicTextDrawSetShadow
+#define TextDrawSetShadow(%0,%1) DynamicTextDrawSetShadow(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetOutline
 	#undef TextDrawSetOutline
 #else
 	#define _ALS_TextDrawSetOutline
 #endif
-#define TextDrawSetOutline DynamicTextDrawSetOutline
+#define TextDrawSetOutline(%0,%1) DynamicTextDrawSetOutline(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_TextDrawBackgroundColour
@@ -335,14 +335,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_TextDrawBackgroundColour
 	#endif
-	#define TextDrawBackgroundColour DynamicTextDrawBackgroundColour
+	#define TextDrawBackgroundColour(%0,%1) DynamicTextDrawBackgroundColour(%0, %1, __file, __line)
 #else
 	#if defined _ALS_TextDrawBackgroundColor
 		#undef TextDrawBackgroundColor
 	#else
 		#define _ALS_TextDrawBackgroundColor
 	#endif
-	#define TextDrawBackgroundColor DynamicTextDrawBackgroundColour
+	#define TextDrawBackgroundColor(%0,%1) DynamicTextDrawBackgroundColour(%0, %1, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_TextDrawFont
@@ -350,49 +350,49 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawFont
 #endif
-#define TextDrawFont DynamicTextDrawFont
+#define TextDrawFont(%0,%1) DynamicTextDrawFont(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetProportional
 	#undef TextDrawSetProportional
 #else
 	#define _ALS_TextDrawSetProportional
 #endif
-#define TextDrawSetProportional DynamicTextDrawSetProportional
+#define TextDrawSetProportional(%0,%1) DynamicTextDrawSetProportional(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetSelectable
 	#undef TextDrawSetSelectable
 #else
 	#define _ALS_TextDrawSetSelectable
 #endif
-#define TextDrawSetSelectable DynamicTextDrawSetSelectable
+#define TextDrawSetSelectable(%0,%1) DynamicTextDrawSetSelectable(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawShowForPlayer
 	#undef TextDrawShowForPlayer
 #else
 	#define _ALS_TextDrawShowForPlayer
 #endif
-#define TextDrawShowForPlayer DynamicTextDrawShowForPlayer
+#define TextDrawShowForPlayer(%0,%1) DynamicTextDrawShowForPlayer(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawHideForPlayer
 	#undef TextDrawHideForPlayer
 #else
 	#define _ALS_TextDrawHideForPlayer
 #endif
-#define TextDrawHideForPlayer DynamicTextDrawHideForPlayer
+#define TextDrawHideForPlayer(%0,%1) DynamicTextDrawHideForPlayer(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawShowForAll
 	#undef TextDrawShowForAll
 #else
 	#define _ALS_TextDrawShowForAll
 #endif
-#define TextDrawShowForAll DynamicTextDrawShowForAll
+#define TextDrawShowForAll(%0) DynamicTextDrawShowForAll(%0, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawHideForAll
 	#undef TextDrawHideForAll
 #else
 	#define _ALS_TextDrawHideForAll
 #endif
-#define TextDrawHideForAll DynamicTextDrawHideForAll
+#define TextDrawHideForAll(%0) DynamicTextDrawHideForAll(%0, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetString
 	#undef TextDrawSetString
@@ -406,14 +406,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_TextDrawSetPreviewModel
 #endif
-#define TextDrawSetPreviewModel DynamicTextDrawSetPreviewModel
+#define TextDrawSetPreviewModel(%0,%1) DynamicTextDrawSetPreviewModel(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetPreviewRot
 	#undef TextDrawSetPreviewRot
 #else
 	#define _ALS_TextDrawSetPreviewRot
 #endif
-#define TextDrawSetPreviewRot DynamicTextDrawSetPreviewRot
+#define TextDrawSetPreviewRot(%0,%1,%2,%3,%4) DynamicTextDrawSetPreviewRot(%0, %1, %2, %3, %4, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_TextDrawSetPreviewVehicleColours
@@ -421,14 +421,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_TextDrawSetPreviewVehicleColours
 	#endif
-	#define TextDrawSetPreviewVehicleColours DynamicTextDrawSetPreviewVehCol
+	#define TextDrawSetPreviewVehicleColours(%0,%1,%2) DynamicTextDrawSetPreviewVehCol(%0, %1, %2, __file, __line)
 #else
 	#if defined _ALS_TextDrawSetPreviewVehCol
 		#undef TextDrawSetPreviewVehCol
 	#else
 		#define _ALS_TextDrawSetPreviewVehCol
 	#endif
-	#define TextDrawSetPreviewVehCol DynamicTextDrawSetPreviewVehCol
+	#define TextDrawSetPreviewVehCol(%0,%1,%2) DynamicTextDrawSetPreviewVehCol(%0, %1, %2, __file, __line)
 #endif
 /*******************************************************************************/
 
@@ -459,28 +459,28 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawDestroy
 #endif
-#define PlayerTextDrawDestroy DestroyDynamicPlayerTextDraw
+#define PlayerTextDrawDestroy(%0,%1) DestroyDynamicPlayerTextDraw(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawLetterSize
 	#undef PlayerTextDrawLetterSize
 #else
 	#define _ALS_PlayerTextDrawLetterSize
 #endif
-#define PlayerTextDrawLetterSize DynamicPlayerTextDrawLetterSize
+#define PlayerTextDrawLetterSize(%0,%1,%2,%3) DynamicPlayerTextDrawLetterSize(%0, %1, %2, %3, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawTextSize
 	#undef PlayerTextDrawTextSize
 #else
 	#define _ALS_PlayerTextDrawTextSize
 #endif
-#define PlayerTextDrawTextSize DynamicPlayerTextDrawTextSize
+#define PlayerTextDrawTextSize(%0,%1,%2,%3) DynamicPlayerTextDrawTextSize(%0, %1, %2, %3, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawAlignment
 	#undef PlayerTextDrawAlignment
 #else
 	#define _ALS_PlayerTextDrawAlignment
 #endif
-#define PlayerTextDrawAlignment DynamicPlayerTextDrawAlignment
+#define PlayerTextDrawAlignment(%0,%1,%2) DynamicPlayerTextDrawAlignment(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_PlayerTextDrawColour
@@ -488,14 +488,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_PlayerTextDrawColour
 	#endif
-	#define PlayerTextDrawColour DynamicPlayerTextDrawColour
+	#define PlayerTextDrawColour(%0,%1,%2) DynamicPlayerTextDrawColour(%0, %1, %2, __file, __line)
 #else
 	#if defined _ALS_PlayerTextDrawColor
 		#undef PlayerTextDrawColor
 	#else
 		#define _ALS_PlayerTextDrawColor
 	#endif
-	#define PlayerTextDrawColor DynamicPlayerTextDrawColour
+	#define PlayerTextDrawColor(%0,%1,%2) DynamicPlayerTextDrawColour(%0, %1, %2, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawUseBox
@@ -503,7 +503,7 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawUseBox
 #endif
-#define PlayerTextDrawUseBox DynamicPlayerTextDrawUseBox
+#define PlayerTextDrawUseBox(%0,%1,%2) DynamicPlayerTextDrawUseBox(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_PlayerTextDrawBoxColour
@@ -511,14 +511,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_PlayerTextDrawBoxColour
 	#endif
-	#define PlayerTextDrawBoxColour DynamicPlayerTextDrawBoxColor
+	#define PlayerTextDrawBoxColour(%0,%1,%2) DynamicPlayerTextDrawBoxColor(%0, %1, %2, __file, __line)
 #else
 	#if defined _ALS_PlayerTextDrawBoxColor
 		#undef PlayerTextDrawBoxColor
 	#else
 		#define _ALS_PlayerTextDrawBoxColor
 	#endif
-	#define PlayerTextDrawBoxColor DynamicPlayerTextDrawBoxColor
+	#define PlayerTextDrawBoxColor(%0,%1,%2) DynamicPlayerTextDrawBoxColor(%0, %1, %2, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetShadow
@@ -526,29 +526,29 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawSetShadow
 #endif
-#define PlayerTextDrawSetShadow DynamicPlayerTextDrawSetShadow
+#define PlayerTextDrawSetShadow(%0,%1,%2) DynamicPlayerTextDrawSetShadow(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetOutline
 	#undef PlayerTextDrawSetOutline
 #else
 	#define _ALS_PlayerTextDrawSetOutline
 #endif
-#define PlayerTextDrawSetOutline DynamicPlayerTextDrawSetOutline
+#define PlayerTextDrawSetOutline(%0,%1,%2) DynamicPlayerTextDrawSetOutline(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
-	#if defined _ALS_PlayerTextDrawBackgroundCo
+	#if defined _ALS_PlayerTextDrawBackgroundColour
 		#undef PlayerTextDrawBackgroundColour
 	#else
-		#define _ALS_PlayerTextDrawBackgroundCo
+		#define _ALS_PlayerTextDrawBackgroundColour
 	#endif
-	#define PlayerTextDrawBackgroundColour DynamicPlayerTextDrawBGColour
+	#define PlayerTextDrawBackgroundColour(%0,%1,%2) DynamicPlayerTextDrawBGColour(%0, %1, %2, __file, __line)
 #else
 	#if defined _ALS_PlayerTextDrawBackgroundCo
 		#undef PlayerTextDrawBackgroundColor
 	#else
 		#define _ALS_PlayerTextDrawBackgroundCo
 	#endif
-	#define PlayerTextDrawBackgroundColor DynamicPlayerTextDrawBGColour
+	#define PlayerTextDrawBackgroundColor(%0,%1,%2) DynamicPlayerTextDrawBGColour(%0, %1, %2, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawFont
@@ -556,22 +556,22 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawFont
 #endif
-#define PlayerTextDrawFont DynamicPlayerTextDrawFont
+#define PlayerTextDrawFont(%0,%1,%2) DynamicPlayerTextDrawFont(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
-	#if defined _ALS_PlayerTextDrawSetProportional
+	#if defined _ALS_PlayerTextDrawSetProportio
 		#undef PlayerTextDrawSetProportional
 	#else
-		#define _ALS_PlayerTextDrawSetProportional
+		#define _ALS_PlayerTextDrawSetProportio
 	#endif
-	#define PlayerTextDrawSetProportional DynPlayerTextSetProportional
+	#define PlayerTextDrawSetProportional(%0,%1,%2) DynPlayerTextSetProportional(%0, %1, %2, __file, __line)
 #else
 	#if defined _ALS_PlayerTextDrawSetProportio
 		#undef PlayerTextDrawSetProportional
 	#else
 		#define _ALS_PlayerTextDrawSetProportio
 	#endif
-	#define PlayerTextDrawSetProportional DynPlayerTextSetProportional
+	#define PlayerTextDrawSetProportional(%0,%1,%2) DynPlayerTextSetProportional(%0, %1, %2, __file, __line)
 #endif
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetSelectabl
@@ -579,21 +579,21 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawSetSelectabl
 #endif
-#define PlayerTextDrawSetSelectable DynamicPlayerTextDrawSelectable
+#define PlayerTextDrawSetSelectable(%0,%1,%2) DynamicPlayerTextDrawSelectable(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawShow
 	#undef PlayerTextDrawShow
 #else
 	#define _ALS_PlayerTextDrawShow
 #endif
-#define PlayerTextDrawShow DynamicPlayerTextDrawShow
+#define PlayerTextDrawShow(%0,%1) DynamicPlayerTextDrawShow(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawHide
 	#undef PlayerTextDrawHide
 #else
 	#define _ALS_PlayerTextDrawHide
 #endif
-#define PlayerTextDrawHide DynamicPlayerTextDrawHide
+#define PlayerTextDrawHide(%0,%1) DynamicPlayerTextDrawHide(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetString
 	#undef PlayerTextDrawSetString
@@ -607,14 +607,14 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 #else
 	#define _ALS_PlayerTextDrawSetPreviewMo
 #endif
-#define PlayerTextDrawSetPreviewModel DynamicPlayerTextDrawSetPrevMdl
+#define PlayerTextDrawSetPreviewModel(%0,%1,%2) DynamicPlayerTextDrawSetPrevMdl(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetPreviewRo
 	#undef PlayerTextDrawSetPreviewRot
 #else
 	#define _ALS_PlayerTextDrawSetPreviewRo
 #endif
-#define PlayerTextDrawSetPreviewRot DynamicPlayerTextDrawSetPrevRot
+#define PlayerTextDrawSetPreviewRot(%0,%1,%2,%3,%4,%5) DynamicPlayerTextDrawSetPrevRot(%0, %1, %2, %3, %4, %5, __file, __line)
 /*******************************************************************************/
 #if defined _INC_omp_textdraw
 	#if defined _ALS_PlayerTextDrawSetPreviewVehicleColours
@@ -622,13 +622,68 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 	#else
 		#define _ALS_PlayerTextDrawSetPreviewVehicleColours
 	#endif
-	#define PlayerTextDrawSetPreviewVehicleColours DynamicPlayerTextDrawPrevVehCol
+	#define PlayerTextDrawSetPreviewVehicleColours(%0,%1,%2,%3) DynamicPlayerTextDrawPrevVehCol(%0, %1, %2, %3, __file, __line)
 #else
 	#if defined _ALS_PlayerTextDrawSetPreviewVe
 		#undef PlayerTextDrawSetPreviewVehCol
 	#else
 		#define _ALS_PlayerTextDrawSetPreviewVe
 	#endif
-	#define PlayerTextDrawSetPreviewVehCol DynamicPlayerTextDrawPrevVehCol
+	#define PlayerTextDrawSetPreviewVehCol(%0,%1,%2,%3) DynamicPlayerTextDrawPrevVehCol(%0, %1, %2, %3, __file, __line)
 #endif
-/*******************************************************************************/
+
+/***
+ *    888                            8888888888                                      888    
+ *    888                            888                                             888    
+ *    888                            888                                             888    
+ *    888      .d88b.   .d88b.       8888888  .d88b.  888d888 88888b.d88b.   8888b.  888888 
+ *    888     d88""88b d88P"88b      888     d88""88b 888P"   888 "888 "88b     "88b 888    
+ *    888     888  888 888  888      888     888  888 888     888  888  888 .d888888 888    
+ *    888     Y88..88P Y88b 888      888     Y88..88P 888     888  888  888 888  888 Y88b.  
+ *    88888888 "Y88P"   "Y88888      888      "Y88P"  888     888  888  888 "Y888888  "Y888 
+ *                          888                                                             
+ *                     Y8b d88P                                                             
+ *                      "Y88P"                                                              
+ */
+
+// Global
+#define IsDynTextDrawVisibleForPlayer(%0,%1)				IsDynTextDrawVisibleForPlayer_(%0, %1, __file, __line)
+#define DynamicTextDrawSetPos(%0,%1,%2)						DynamicTextDrawSetPos_(%0, %1, %2, __file, __line)
+#define DynamicTextDrawGetLetterSize(%0,%1,%2)				DynamicTextDrawGetLetterSize_(%0, %1, %2, __file, __line)
+#define DynamicTextDrawGetTextSize(%0,%1,%2)				DynamicTextDrawGetTextSize_(%0, %1, %2, __file, __line)
+#define DynamicTextDrawGetPos(%0,%1,%2)						DynamicTextDrawGetPos_(%0, %1, %2, __file, __line)
+#define DynamicTextDrawGetColour(%0)						DynamicTextDrawGetColour_(%0, __file, __line)
+#define DynamicTextDrawGetBoxColour(%0)						DynamicTextDrawGetBoxColour_(%0, __file, __line)
+#define DynamicTextDrawGetBackgroundCol(%0)					DynamicTextDrawGetBackgroundCo(%0, __file, __line)
+#define DynamicTextDrawGetShadow(%0)						DynamicTextDrawGetShadow_(%0, __file, __line)
+#define DynamicTextDrawGetOutline(%0)						DynamicTextDrawGetOutline_(%0, __file, __line)
+#define DynamicTextDrawGetFont(%0)							DynamicTextDrawGetFont_(%0, __file, __line)
+#define DynamicTextDrawIsBox(%0)							DynamicTextDrawIsBox_(%0, __file, __line)
+#define DynamicTextDrawIsProportional(%0)					DynamicTextDrawIsProportional_(%0, __file, __line)
+#define DynamicTextDrawIsSelectable(%0)						DynamicTextDrawIsSelectable_(%0, __file, __line)
+#define DynamicTextDrawGetAlignment(%0)						DynamicTextDrawGetAlignment_(%0, __file, __line)
+#define DynamicTextDrawGetPreviewModel(%0)					DynamicTextDrawGetPreviewModel_(%0, __file, __line)
+#define DynamicTextDrawGetPreviewRot(%0,%1,%2,%3,%4)		DynamicTextDrawGetPreviewRot_(%0, %1, %2, %3, %4, __file, __line)
+#define DynamicTextDrawGetPreviewVehCol(%0,%1,%2)			DynamicTextDrawGetPreviewVehCo(%0, %1, %2, __file, __line)
+#define DynamicTextDrawGetRealID(%0,%1)						DynamicTextDrawGetRealID_(%0, %1, __file, __line)
+
+// Player
+#define IsDynamicPlayerTextDrawVisible(%0,%1)				IsDynamicPlayerTextDrawVisible_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawSetPos(%0,%1,%2,%3)			DynamicPlayerTextDrawSetPos_(%0, %1, %2, %3, __file, __line)
+#define DynPlayerTextDrawGetLetterSize(%0,%1,%2,%3)			DynPlayerTextDrawGetLetterSize_(%0, %1, %2, %3, __file, __line)
+#define DynPlayerTextDrawGetTextSize(%0,%1,%2,%3)			DynPlayerTextDrawGetTextSize_(%0, %1, %2, %3, __file, __line)
+#define DynamicPlayerTextDrawGetPos(%0,%1,%2,%3)			DynamicPlayerTextDrawGetPos_(%0, %1, %2, %3, __file, __line)
+#define DynamicPlayerTextDrawGetColour(%0,%1)				DynamicPlayerTextDrawGetColour_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawGetBoxCol(%0,%1)				DynamicPlayerTextDrawGetBoxCol_(%0, %1, __file, __line)
+#define DynPlayerTextDrawGetBGColour(%0,%1)					DynPlayerTextDrawGetBGColour_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawGetShadow(%0,%1)				DynamicPlayerTextDrawGetShadow_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawGetOutline(%0,%1)				DynamicPlayerTextDrawGetOutlin_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawGetFont(%0,%1)					DynamicPlayerTextDrawGetFont_(%0, %1, __file, __line)
+#define DynamicPlayerTextDrawIsBox(%0,%1)					DynamicPlayerTextDrawIsBox_(%0, %1, __file, __line)
+#define DynPlayerTextDrawIsProportional(%0,%1)				DynPlayerTextDrawIsProportiona_(%0, %1, __file, __line)
+#define DynPlayerTextDrawIsSelectable(%0,%1)				DynPlayerTextDrawIsSelectable_(%0, %1, __file, __line)
+#define DynPlayerTextDrawGetAlignment(%0,%1)				DynPlayerTextDrawGetAlignment_(%0, %1, __file, __line)
+#define DynPlayerTextDrawGetPreviewMdl(%0,%1)				DynPlayerTextDrawGetPreviewMdl_(%0, %1, __file, __line)
+#define DynPlayerTextDrawGetPreviewRot(%0,%1,%2,%3,%4,%5)	DynPlayerTextDrawGetPreviewRot_(%0, %1, %2, %3, %4, %5, __file, __line)
+#define DynPlayerTextDrawGetPrevVehCol(%0,%1,%2,%3)			DynPlayerTextDrawGetPrevVehCol_(%0, %1, %2, %3, __file, __line)
+#define PlayerTextDrawGetRealID(%0,%1,%2)					PlayerTextDrawGetRealID_(%0, %1, %2, __file, __line)
