@@ -283,14 +283,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_TextDrawColour
 	#endif
 	#define TextDrawColour(%0,%1) DynamicTextDrawColour(%0, %1, __file, __line)
-#else
-	#if defined _ALS_TextDrawColor
-		#undef TextDrawColor
-	#else
-		#define _ALS_TextDrawColor
-	#endif
-	#define TextDrawColor(%0,%1) DynamicTextDrawColour(%0, %1, __file, __line)
 #endif
+#if defined _ALS_TextDrawColor
+	#undef TextDrawColor
+#else
+	#define _ALS_TextDrawColor
+#endif
+#define TextDrawColor(%0,%1) DynamicTextDrawColour(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawUseBox
 	#undef TextDrawUseBox
@@ -306,14 +305,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_TextDrawBoxColour
 	#endif
 	#define TextDrawBoxColour(%0,%1) DynamicTextDrawBoxColour(%0, %1, __file, __line)
-#else
-	#if defined _ALS_TextDrawBoxColor
-		#undef TextDrawBoxColor
-	#else
-		#define _ALS_TextDrawBoxColor
-	#endif
-	#define TextDrawBoxColor(%0,%1) DynamicTextDrawBoxColour(%0, %1, __file, __line)
 #endif
+#if defined _ALS_TextDrawBoxColor
+	#undef TextDrawBoxColor
+#else
+	#define _ALS_TextDrawBoxColor
+#endif
+#define TextDrawBoxColor(%0,%1) DynamicTextDrawBoxColour(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawSetShadow
 	#undef TextDrawSetShadow
@@ -336,14 +334,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_TextDrawBackgroundColour
 	#endif
 	#define TextDrawBackgroundColour(%0,%1) DynamicTextDrawBackgroundColour(%0, %1, __file, __line)
-#else
-	#if defined _ALS_TextDrawBackgroundColor
-		#undef TextDrawBackgroundColor
-	#else
-		#define _ALS_TextDrawBackgroundColor
-	#endif
-	#define TextDrawBackgroundColor(%0,%1) DynamicTextDrawBackgroundColour(%0, %1, __file, __line)
 #endif
+#if defined _ALS_TextDrawBackgroundColor
+	#undef TextDrawBackgroundColor
+#else
+	#define _ALS_TextDrawBackgroundColor
+#endif
+#define TextDrawBackgroundColor(%0,%1) DynamicTextDrawBackgroundColour(%0, %1, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_TextDrawFont
 	#undef TextDrawFont
@@ -422,14 +419,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_TextDrawSetPreviewVehicleColours
 	#endif
 	#define TextDrawSetPreviewVehicleColours(%0,%1,%2) DynamicTextDrawSetPreviewVehCol(%0, %1, %2, __file, __line)
-#else
-	#if defined _ALS_TextDrawSetPreviewVehCol
-		#undef TextDrawSetPreviewVehCol
-	#else
-		#define _ALS_TextDrawSetPreviewVehCol
-	#endif
-	#define TextDrawSetPreviewVehCol(%0,%1,%2) DynamicTextDrawSetPreviewVehCol(%0, %1, %2, __file, __line)
 #endif
+#if defined _ALS_TextDrawSetPreviewVehCol
+	#undef TextDrawSetPreviewVehCol
+#else
+	#define _ALS_TextDrawSetPreviewVehCol
+#endif
+#define TextDrawSetPreviewVehCol(%0,%1,%2) DynamicTextDrawSetPreviewVehCol(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 
 /***
@@ -489,14 +485,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_PlayerTextDrawColour
 	#endif
 	#define PlayerTextDrawColour(%0,%1,%2) DynamicPlayerTextDrawColour(%0, %1, %2, __file, __line)
-#else
-	#if defined _ALS_PlayerTextDrawColor
-		#undef PlayerTextDrawColor
-	#else
-		#define _ALS_PlayerTextDrawColor
-	#endif
-	#define PlayerTextDrawColor(%0,%1,%2) DynamicPlayerTextDrawColour(%0, %1, %2, __file, __line)
 #endif
+#if defined _ALS_PlayerTextDrawColor
+	#undef PlayerTextDrawColor
+#else
+	#define _ALS_PlayerTextDrawColor
+#endif
+#define PlayerTextDrawColor(%0,%1,%2) DynamicPlayerTextDrawColour(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawUseBox
 	#undef PlayerTextDrawUseBox
@@ -512,14 +507,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_PlayerTextDrawBoxColour
 	#endif
 	#define PlayerTextDrawBoxColour(%0,%1,%2) DynamicPlayerTextDrawBoxColor(%0, %1, %2, __file, __line)
-#else
-	#if defined _ALS_PlayerTextDrawBoxColor
-		#undef PlayerTextDrawBoxColor
-	#else
-		#define _ALS_PlayerTextDrawBoxColor
-	#endif
-	#define PlayerTextDrawBoxColor(%0,%1,%2) DynamicPlayerTextDrawBoxColor(%0, %1, %2, __file, __line)
 #endif
+#if defined _ALS_PlayerTextDrawBoxColor
+	#undef PlayerTextDrawBoxColor
+#else
+	#define _ALS_PlayerTextDrawBoxColor
+#endif
+#define PlayerTextDrawBoxColor(%0,%1,%2) DynamicPlayerTextDrawBoxColor(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetShadow
 	#undef PlayerTextDrawSetShadow
@@ -542,14 +536,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_PlayerTextDrawBackgroundColour
 	#endif
 	#define PlayerTextDrawBackgroundColour(%0,%1,%2) DynamicPlayerTextDrawBGColour(%0, %1, %2, __file, __line)
-#else
-	#if defined _ALS_PlayerTextDrawBackgroundCo
-		#undef PlayerTextDrawBackgroundColor
-	#else
-		#define _ALS_PlayerTextDrawBackgroundCo
-	#endif
-	#define PlayerTextDrawBackgroundColor(%0,%1,%2) DynamicPlayerTextDrawBGColour(%0, %1, %2, __file, __line)
 #endif
+#if defined _ALS_PlayerTextDrawBackgroundCo
+	#undef PlayerTextDrawBackgroundColor
+#else
+	#define _ALS_PlayerTextDrawBackgroundCo
+#endif
+#define PlayerTextDrawBackgroundColor(%0,%1,%2) DynamicPlayerTextDrawBGColour(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawFont
 	#undef PlayerTextDrawFont
@@ -565,14 +558,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_PlayerTextDrawSetProportio
 	#endif
 	#define PlayerTextDrawSetProportional(%0,%1,%2) DynPlayerTextSetProportional(%0, %1, %2, __file, __line)
-#else
-	#if defined _ALS_PlayerTextDrawSetProportio
-		#undef PlayerTextDrawSetProportional
-	#else
-		#define _ALS_PlayerTextDrawSetProportio
-	#endif
-	#define PlayerTextDrawSetProportional(%0,%1,%2) DynPlayerTextSetProportional(%0, %1, %2, __file, __line)
 #endif
+#if defined _ALS_PlayerTextDrawSetProportio
+	#undef PlayerTextDrawSetProportional
+#else
+	#define _ALS_PlayerTextDrawSetProportio
+#endif
+#define PlayerTextDrawSetProportional(%0,%1,%2) DynPlayerTextSetProportional(%0, %1, %2, __file, __line)
 /*******************************************************************************/
 #if defined _ALS_PlayerTextDrawSetSelectabl
 	#undef PlayerTextDrawSetSelectable
@@ -623,14 +615,13 @@ forward OnClickDynamicPlayerTextDraw(playerid, PlayerText:textid);
 		#define _ALS_PlayerTextDrawSetPreviewVehicleColours
 	#endif
 	#define PlayerTextDrawSetPreviewVehicleColours(%0,%1,%2,%3) DynamicPlayerTextDrawPrevVehCol(%0, %1, %2, %3, __file, __line)
-#else
-	#if defined _ALS_PlayerTextDrawSetPreviewVe
-		#undef PlayerTextDrawSetPreviewVehCol
-	#else
-		#define _ALS_PlayerTextDrawSetPreviewVe
-	#endif
-	#define PlayerTextDrawSetPreviewVehCol(%0,%1,%2,%3) DynamicPlayerTextDrawPrevVehCol(%0, %1, %2, %3, __file, __line)
 #endif
+#if defined _ALS_PlayerTextDrawSetPreviewVe
+	#undef PlayerTextDrawSetPreviewVehCol
+#else
+	#define _ALS_PlayerTextDrawSetPreviewVe
+#endif
+#define PlayerTextDrawSetPreviewVehCol(%0,%1,%2,%3) DynamicPlayerTextDrawPrevVehCol(%0, %1, %2, %3, __file, __line)
 
 /***
  *    888                            8888888888                                      888    
