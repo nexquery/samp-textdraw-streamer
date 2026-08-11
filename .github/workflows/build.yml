@@ -1,0 +1,140 @@
+name: build
+
+on:
+  push:
+    branches: [ master, main ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    name: Linux (x86)
+    runs-on: ubuntu-latest
+    # Built inside an old-glibc container rather than on the runner image.
+    # Whatever glibc builds the .so becomes its minimum requirement, and game
+    # hosts routinely run older distros than "ubuntu-latest" points at.
+    #
+    # Debian 11 ships glibc 2.31, which is deliberately *before* the 2.34
+    # libpthread/libdl/librt merge into libc. Building on anything 2.34+ makes
+    # sampgdk's dlopen/pthread calls demand GLIBC_2.34, which is what broke
+    # loading on real servers. 2.31 caps the requirement structurally.
+    container: debian:11
+    steps:
+      # Before checkout: the container is bare, and actions/checkout wants git.
+      - name: Install toolchain
+        run: |
+          set -e
+
+          # Bullseye's LTS window has ended, so its packages may have moved to
+          # archive.debian.org. Fall back rather than fail with a bare 404.
+          if ! apt-get update 2>/dev/null; then
+            echo "Primary mirrors unavailable; using archive.debian.org"
+            {
+              echo "deb http://archive.debian.org/debian bullseye main"
+              echo "deb http://archive.debian.org/debian-security bullseye-security main"
+            } > /etc/apt/sources.list
+            apt-get -o Acquire::Check-Valid-Until=false update
+          fi
+
+          apt-get install -y --no-install-recommends \
+            build-essential gcc-multilib g++-multilib \
+            cmake file binutils git ca-certificates
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S src -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release -j
+
+      - name: Verify the artifact is 32-bit and portable
+        run: |
+          file build/textdraw-streamer.so
+          file build/textdraw-streamer.so | grep -q 'ELF 32-bit'
+
+          # Fail the build rather than ship a .so that will not load. The
+          # container's own glibc (2.31) is the ceiling this can produce.
+          max_allowed="2.31"
+          required=$(objdump -T build/textdraw-streamer.so \
+            | grep -o 'GLIBC_[0-9]\+\.[0-9]\+' | sed 's/GLIBC_//' | sort -uV)
+
+          echo "glibc versions required:"
+          echo "$required" | sed 's/^/  /'
+
+          highest=$(echo "$required" | tail -1)
+          if [ "$(printf '%s\n%s\n' "$max_allowed" "$highest" | sort -V | tail -1)" != "$max_allowed" ]; then
+            echo "::error::Requires GLIBC_$highest, above the $max_allowed baseline."
+            exit 1
+          fi
+          echo "OK: highest requirement GLIBC_$highest <= $max_allowed"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: textdraw-streamer-linux
+          path: build/textdraw-streamer.so
+
+  windows:
+    name: Windows (x86)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S src -B build -A Win32
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: textdraw-streamer-windows
+          path: build/Release/textdraw-streamer.dll
+
+  release:
+    name: Release
+    needs: [ linux, windows ]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: textdraw-streamer-linux
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: textdraw-streamer-windows
+          path: windows
+
+      # The layout sampctl expects, per the "resources" block in pawn.json:
+      # the plugin under plugins/ and the include under pawno/include/.
+      - name: Package
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+
+          mkdir -p pkg/plugins pkg/pawno/include
+          cp textdraw-streamer.inc pkg/pawno/include/
+
+          cp linux/textdraw-streamer.so pkg/plugins/
+          (cd pkg && zip -r "../textdraw-streamer.${version}.linux.zip" plugins pawno)
+          rm pkg/plugins/textdraw-streamer.so
+
+          cp windows/textdraw-streamer.dll pkg/plugins/
+          (cd pkg && zip -r "../textdraw-streamer.${version}.windows.zip" plugins pawno)
+
+          ls -la textdraw-streamer.*.zip
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            textdraw-streamer.*.zip

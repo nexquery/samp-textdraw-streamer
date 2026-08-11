@@ -26,7 +26,35 @@ bool load = false;
 extern void *pAMXFunctions;
 std::set<AMX*> gAmx;
 
-PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports() 
+static void PrintBanner(const char* state)
+{
+	sampgdk::logprintf("");
+	sampgdk::logprintf(" =================================");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |    textdraw-streamer v%d.%d.%d   |", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+	sampgdk::logprintf(" |            %-19s|", state);
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  Coding:                      |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  Burak (Nexor)                |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  Compiled:                    |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  %02d.%02d.%04d, %02d:%02d:%02d         |", BUILD_DAY, BUILD_MONTH, BUILD_YEAR, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  Github:                      |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  github.com/nexquery          |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  Discord:                     |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" |  benburakya - Nexor#4730      |");
+	sampgdk::logprintf(" |                               |");
+	sampgdk::logprintf(" =================================");
+	sampgdk::logprintf("");
+}
+
+PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports()
 {
 	return sampgdk::Supports() | SUPPORTS_AMX_NATIVES | SUPPORTS_PROCESS_TICK;
 }
@@ -35,33 +63,11 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 {
 	pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
 	load = sampgdk::Load(ppData);
-	if (load)
-	{
-		sampgdk::logprintf("");
-		sampgdk::logprintf(" =================================");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |    textdraw-streamer v%d.%d.%d   |", MINOR, MAJOR, PATCH);
-		sampgdk::logprintf(" |            Loaded             |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Coding:                      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Burak (Nexor)                |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Compiled:                    |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  %02d.%02d.%04d, %02d:%02d:%02d         |", BUILD_DAY, BUILD_MONTH, BUILD_YEAR, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Github:                      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  github.com/nexquery          |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Discord:                     |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  benburakya - Nexor#4730      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" =================================");
-		sampgdk::logprintf("");	
+
+	if (load) {
+		PrintBanner("Loaded");
 	}
+
 	return load;
 }
 
@@ -70,32 +76,9 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 	if (load)
 	{
 		GlobalText::Destroy();
-		PlayerText::Destroy(-1);
+		PlayerText::DestroyAll();
 
-		sampgdk::logprintf("");
-		sampgdk::logprintf(" =================================");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |    textdraw-streamer v%d.%d.%d   |", MINOR, MAJOR, PATCH);
-		sampgdk::logprintf(" |           Unloaded            |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Coding:                      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Burak (Nexor)                |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Compiled:                    |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  %02d.%02d.%04d, %02d:%02d:%02d         |", BUILD_DAY, BUILD_MONTH, BUILD_YEAR, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Github:                      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  github.com/nexquery          |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  Discord:                     |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" |  benburakya - Nexor#4730      |");
-		sampgdk::logprintf(" |                               |");
-		sampgdk::logprintf(" =================================");
-		sampgdk::logprintf("");
+		PrintBanner("Unloaded");
 	}
 }
 
@@ -124,7 +107,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicTextDrawSetPreviewModel",					Natives::DynamicTextDrawSetPreviewModel},
 	{"DynamicTextDrawSetPreviewRot",					Natives::DynamicTextDrawSetPreviewRot},
 	{"DynamicTextDrawSetPreviewVehCol",					Natives::DynamicTextDrawSetPreviewVehicleColours},
-	
+
 	{"IsValidDynamicTextDraw",							Natives::IsValidDynamicTextDraw},
 	{"IsDynTextDrawVisibleForPlayer",					Natives::IsDynamicTextDrawVisibleForPlayer},
 	{"DynamicTextDrawGetString",						Natives::DynamicTextDrawGetString},
@@ -169,7 +152,7 @@ extern "C" const AMX_NATIVE_INFO NativeList[] =
 	{"DynamicPlayerTextDrawSetPrevMdl",					Natives::DynamicPlayerTextDrawSetPreviewModel},
 	{"DynamicPlayerTextDrawSetPrevRot",					Natives::DynamicPlayerTextDrawSetPreviewRot},
 	{"DynamicPlayerTextDrawPrevVehCol",					Natives::DynamicPlayerTextDrawSetPreviewVehicleColours},
-	
+
 	{"IsValidDynamicPlayerTextDraw",					Natives::IsValidDynamicPlayerTextDraw},
 	{"IsDynamicPlayerTextDrawVisible",					Natives::IsDynamicPlayerTextDrawVisible},
 	{"DynamicPlayerTextDrawGetString",					Natives::DynamicPlayerTextDrawGetString},
@@ -231,6 +214,10 @@ PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX *amx)
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX *amx)
 {
+	// The logger holds this AMX to resolve __file lazily; drop it before the
+	// script goes away so a later message cannot read freed memory.
+	Plugin_Settings::ClearContext(amx);
+
 	gAmx.erase(amx);
 	return AMX_ERR_NONE;
 }
@@ -242,9 +229,7 @@ PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerConnect(int playerid)
 {
-	// Baðlanan oyuncuyu listeye ekle
-	if (playerid >= 0 && playerid < MAX_PLAYERS)
-	{
+	if (playerid >= 0 && playerid < MAX_PLAYERS) {
 		GlobalText::PlayerList.insert(playerid);
 	}
 	return true;
@@ -252,116 +237,119 @@ PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerConnect(int playerid)
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerDisconnect(int playerid, int reason)
 {
-	// Baðlanan oyuncuda textdraw gözüküyor mu?
-	for (auto textList = GlobalText::gTextVisible.begin(); textList != GlobalText::gTextVisible.end(); textList++)
+	for (auto& entry : GlobalText::gTextVisible)
 	{
-		// Tüm textdrawlarda bu oyuncuyu ara
-		auto p = GlobalText::gTextVisible[textList->first].find(playerid);
-		if (p != GlobalText::gTextVisible[textList->first].end())
-		{
-			// Textdraw da gösteriliyorsa oyuncuyu kaldýr
-			GlobalText::gTextVisible[textList->first].erase(p);
+		// erase returns 0 when this player was not a viewer, so the lookup and the
+		// removal are one operation instead of find-then-erase per textdraw.
+		if (entry.second.erase(playerid) == 0) {
+			continue;
 		}
 
-		// Gösterilen textdraw da oyuncu kalmadýysa
-		if (GlobalText::gTextVisible[textList->first].empty())
+		// That was the last viewer, so hand the global slot back to the server.
+		if (entry.second.empty())
 		{
-			// Textdrawý sunucudan sil
-			auto t = GlobalText::gText->find(textList->first);
-			if (t != GlobalText::gText->end())
+			auto it = GlobalText::gText.find(entry.first);
+			if (it != GlobalText::gText.end())
 			{
-				if (t->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-				{
-					TextDrawDestroy(t->second->real_id);
-					t->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
-				}
+				GlobalText::DestroyReal(it->second);
+				it->second.visible = false;
 			}
 		}
 	}
 
-	// Baðlanan oyuncuyu listeden kaldýr
 	GlobalText::PlayerList.erase(playerid);
 
-	// PlayerTextdraw havuzunu ve slot manageri temizle
+	// Frees the player's textdraw pool and resets their slot manager.
 	PlayerText::Destroy(playerid);
 	return true;
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickTextDraw(int playerid, int clickedid)
 {
-	// ESC bastýysa
+	if (gAmx.empty()) {
+		return false;
+	}
+
+	int idx = 0;
+
+	// The escape key.
 	if (clickedid == INVALID_TEXT_DRAW)
 	{
-		int idx;
-		for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
+		for (AMX* amx : gAmx)
 		{
-			if (!amx_FindPublic(*p, "OnCancelDynamicTextDraw", &idx))
+			if (!amx_FindPublic(amx, "OnCancelDynamicTextDraw", &idx))
 			{
-				amx_Push(*p, static_cast<cell>(playerid));
-				amx_Exec(*p, NULL, idx);
+				amx_Push(amx, static_cast<cell>(playerid));
+				amx_Exec(amx, NULL, idx);
 			}
-			
-			if (!amx_FindPublic(*p, "OnClickDynamicTextDraw", &idx))
+
+			if (!amx_FindPublic(amx, "OnClickDynamicTextDraw", &idx))
 			{
-				amx_Push(*p, static_cast<cell>(INVALID_TEXT_DRAW));
-				amx_Push(*p, static_cast<cell>(playerid));
-				amx_Exec(*p, NULL, idx);
+				amx_Push(amx, static_cast<cell>(INVALID_TEXT_DRAW));
+				amx_Push(amx, static_cast<cell>(playerid));
+				amx_Exec(amx, NULL, idx);
 			}
 		}
+
+		return false;
 	}
-	else
+
+	// Reverse index, rather than scanning every global textdraw for a real_id.
+	auto mapped = GlobalText::realToText.find(clickedid);
+	if (mapped == GlobalText::realToText.end()) {
+		return false;
+	}
+
+	for (AMX* amx : gAmx)
 	{
-		if (!gAmx.empty() && !GlobalText::gText->empty())
+		if (!amx_FindPublic(amx, "OnClickDynamicTextDraw", &idx))
 		{
-			for (std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->begin(); it != GlobalText::gText->end(); it++)
-			{
-				if (it->second->real_id == clickedid)
-				{
-					int idx;
-					for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
-					{
-						if (!amx_FindPublic(*p, "OnClickDynamicTextDraw", &idx))
-						{
-							amx_Push(*p, static_cast<cell>(it->first));
-							amx_Push(*p, static_cast<cell>(playerid));
-							amx_Exec(*p, NULL, idx);
-						}
-					}
-					break;
-				}
-			}
+			amx_Push(amx, static_cast<cell>(mapped->second));
+			amx_Push(amx, static_cast<cell>(playerid));
+			amx_Exec(amx, NULL, idx);
 		}
 	}
+
 	return false;
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL OnPlayerClickPlayerTextDraw(int playerid, int playertextid)
 {
-	if (!gAmx.empty() && PlayerText::pText[playerid] != nullptr && !PlayerText::pText[playerid]->empty())
+	if (gAmx.empty()) {
+		return false;
+	}
+
+	// Pool() does not insert, unlike the operator[] this replaces.
+	TextMap* pool = PlayerText::Pool(playerid);
+	if (pool == nullptr) {
+		return false;
+	}
+
+	for (const auto& entry : *pool)
 	{
-		for (auto it = PlayerText::pText[playerid]->begin(); it != PlayerText::pText[playerid]->end(); it++)
+		if (entry.second.real_id != playertextid) {
+			continue;
+		}
+
+		int idx = 0;
+		for (AMX* amx : gAmx)
 		{
-			if (it->second->real_id == playertextid)
+			if (!amx_FindPublic(amx, "OnClickDynamicPlayerTextDraw", &idx))
 			{
-				int idx;
-				for (std::set<AMX*>::iterator p = gAmx.begin(); p != gAmx.end(); p++)
-				{
-					if (!amx_FindPublic(*p, "OnClickDynamicPlayerTextDraw", &idx)) 
-					{
-						//	playerid, textid
-						//
-						//		|		|
-						//
-						//		0		1
-						//
-						amx_Push(*p, static_cast<cell>(it->first));	//	1
-						amx_Push(*p, static_cast<cell>(playerid));	//	0
-						amx_Exec(*p, NULL, idx);
-					}
-				}
-				break;
+				//	playerid, textid
+				//
+				//		|		|
+				//
+				//		0		1
+				//
+				amx_Push(amx, static_cast<cell>(entry.first));	//	1
+				amx_Push(amx, static_cast<cell>(playerid));		//	0
+				amx_Exec(amx, NULL, idx);
 			}
 		}
+
+		break;
 	}
+
 	return false;
 }

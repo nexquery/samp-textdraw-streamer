@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <string>
-#include <sstream>
 #include "sampgdk.hpp"
 
 namespace service
 {
-	void setInt(AMX* amx, cell output, int value);
-	void setFloat(AMX* amx, cell output, float value);
-	void setString(AMX* amx, cell output, cell size, std::string string);
+	// Each of these returns false when the AMX address cannot be resolved,
+	// rather than writing through an unresolved pointer.
+	bool setInt(AMX* amx, cell output, int value);
+	bool setFloat(AMX* amx, cell output, float value);
+	bool setString(AMX* amx, cell output, cell size, const std::string& string);
+
+	// Returns an empty string when the address cannot be resolved.
 	std::string getString(AMX* amx, cell input);
-	std::string formattedString(AMX* amx, cell* params, cell text_index, int32_t args_offset);
+
+	// printf-style substitution of the AMX arguments starting at args_offset into
+	// the format string at text_index. A malformed format is emitted verbatim: it
+	// never reads past the end of the format or past params[params[0] / sizeof(cell)].
+	std::string formattedString(AMX* amx, const cell* params, cell text_index, int args_offset);
 };

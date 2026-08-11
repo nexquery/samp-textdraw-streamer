@@ -16,8 +16,6 @@
 
 #include "textdraw_data.hpp"
 #include "slot_manager.hpp"
-#include "sampgdk.hpp"
-
 
  /***
   *     .d8888b.  888          888               888
@@ -29,113 +27,129 @@
   *    Y88b  d88P 888 Y88..88P 888 d88P 888  888 888
   *     "Y8888P88 888  "Y88P"  88888P"  "Y888888 888
   *
-  *
-  *
   */
 
-DefaultText GlobalText::Default;
+const Text_Data GlobalText::Default{};
 std::unordered_set<int> GlobalText::PlayerList;
-std::unordered_map<int, Text_Data*>* GlobalText::gText = new std::unordered_map<int, Text_Data*>();
-std::map<int, std::map<int, bool>> GlobalText::gTextVisible;
+TextMap GlobalText::gText;
+std::unordered_map<int, std::unordered_set<int>> GlobalText::gTextVisible;
+std::unordered_map<int, int> GlobalText::realToText;
+
+Text_Data* GlobalText::Find(int textid, const char* funcs)
+{
+	auto it = gText.find(textid);
+	if (it == gText.end())
+	{
+		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, funcs, INVALID_PLAYER_ID, textid);
+		return nullptr;
+	}
+
+	return &it->second;
+}
+
+void GlobalText::DestroyReal(Text_Data& data)
+{
+	if (data.real_id == INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		return;
+	}
+
+	TextDrawDestroy(data.real_id);
+	realToText.erase(data.real_id);
+	data.real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+}
+
+bool GlobalText::Reload(int textid, Text_Data& data)
+{
+	if (data.real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		return true;
+	}
+
+	const int text_id = TextDrawCreate(data.create_x, data.create_y, data.text.c_str());
+
+	if (text_id == INVALID_TEXT_DRAW)
+	{
+		sampgdk::logprintf("[textdraw.streamer] GlobalText::Reload: A maximum of %d global textdraws can be created.", MAX_TEXT_DRAWS);
+		return false;
+	}
+
+	if (data.lettersize_x != Default.lettersize_x || data.lettersize_y != Default.lettersize_y) {
+		TextDrawLetterSize(text_id, data.lettersize_x, data.lettersize_y);
+	}
+
+	if (data.textsize_x != Default.textsize_x || data.textsize_y != Default.textsize_y) {
+		TextDrawTextSize(text_id, data.textsize_x, data.textsize_y);
+	}
+
+	if (data.alignment != Default.alignment) {
+		TextDrawAlignment(text_id, data.alignment);
+	}
+
+	if (data.color != Default.color) {
+		TextDrawColor(text_id, data.color);
+	}
+
+	if (data.usebox != Default.usebox) {
+		TextDrawUseBox(text_id, data.usebox);
+	}
+
+	if (data.boxcolor != Default.boxcolor) {
+		TextDrawBoxColor(text_id, data.boxcolor);
+	}
+
+	if (data.shadow != Default.shadow) {
+		TextDrawSetShadow(text_id, data.shadow);
+	}
+
+	if (data.outline != Default.outline) {
+		TextDrawSetOutline(text_id, data.outline);
+	}
+
+	if (data.backgroundcolor != Default.backgroundcolor) {
+		TextDrawBackgroundColor(text_id, data.backgroundcolor);
+	}
+
+	if (data.font != Default.font) {
+		TextDrawFont(text_id, data.font);
+	}
+
+	if (data.proportional != Default.proportional) {
+		TextDrawSetProportional(text_id, data.proportional);
+	}
+
+	if (data.selectable != Default.selectable) {
+		TextDrawSetSelectable(text_id, data.selectable);
+	}
+
+	if (data.font == TEXT_DRAW_FONT_MODEL_PREVIEW)
+	{
+		if (data.modelindex != Default.modelindex) {
+			TextDrawSetPreviewModel(text_id, data.modelindex);
+		}
+
+		if (data.fRotX != Default.fRotX || data.fRotY != Default.fRotY
+			|| data.fRotZ != Default.fRotZ || data.fZoom != Default.fZoom) {
+			TextDrawSetPreviewRot(text_id, data.fRotX, data.fRotY, data.fRotZ, data.fZoom);
+		}
+
+		if (data.veh_col1 != Default.veh_col1 || data.veh_col2 != Default.veh_col2) {
+			TextDrawSetPreviewVehCol(text_id, data.veh_col1, data.veh_col2);
+		}
+	}
+
+	data.real_id = text_id;
+	realToText[text_id] = textid;
+	return true;
+}
 
 void GlobalText::Destroy()
 {
-	if (!gText->empty())
-	{
-		for (auto it = gText->begin(); it != gText->end(); it++)
-		{
-			// Extra id
-			delete it->second->extra_id;
-			
-			// Array data
-			delete it->second->array_data;
-			
-			// Text data
-			delete it->second;
-		}
-
-		delete gText;
-		gText = nullptr;
+	for (auto& entry : gText) {
+		DestroyReal(entry.second);
 	}
-}
 
-void GlobalText::Reload(std::unordered_map<int, Text_Data*>::iterator it)
-{
-	if (it->second->real_id == INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		int text_id = TextDrawCreate(it->second->create_x, it->second->create_y, it->second->text.c_str());
-
-		if (text_id == INVALID_TEXT_DRAW)
-		{
-			sampgdk::logprintf("[textdraw.streamer] GlobalText::Reload: A maximum of %d global textdraws can be created.", MAX_TEXT_DRAWS);
-			return;
-		}
-
-		if (it->second->lettersize_x != GlobalText::Default.lettersize_x || it->second->lettersize_y != GlobalText::Default.lettersize_y) {
-			TextDrawLetterSize(text_id, it->second->lettersize_x, it->second->lettersize_y);
-		}
-
-		if (it->second->textsize_x != GlobalText::Default.textsize_x || it->second->textsize_y != GlobalText::Default.textsize_y) {
-			TextDrawTextSize(text_id, it->second->textsize_x, it->second->textsize_y);
-		}
-
-		if (it->second->alignment != GlobalText::Default.alignment) {
-			TextDrawAlignment(text_id, it->second->alignment);
-		}
-
-		if (it->second->color != GlobalText::Default.color) {
-			TextDrawColor(text_id, it->second->color);
-		}
-
-		if (it->second->usebox != GlobalText::Default.usebox) {
-			TextDrawUseBox(text_id, it->second->usebox);
-		}
-
-		if (it->second->boxcolor != GlobalText::Default.boxcolor) {
-			TextDrawBoxColor(text_id, it->second->boxcolor);
-		}
-
-		if (it->second->shadow != GlobalText::Default.shadow) {
-			TextDrawSetShadow(text_id, it->second->shadow);
-		}
-
-		if (it->second->outline != GlobalText::Default.outline) {
-			TextDrawSetOutline(text_id, it->second->outline);
-		}
-
-		if (it->second->backgroundcolor != GlobalText::Default.backgroundcolor) {
-			TextDrawBackgroundColor(text_id, it->second->backgroundcolor);
-		}
-
-		if (it->second->font != GlobalText::Default.font) {
-			TextDrawFont(text_id, it->second->font);
-		}
-
-		if (it->second->proportional != GlobalText::Default.proportional) {
-			TextDrawSetProportional(text_id, it->second->proportional);
-		}
-
-		if (it->second->selectable != GlobalText::Default.selectable) {
-			TextDrawSetSelectable(text_id, it->second->selectable);
-		}
-
-		if (it->second->font == TEXT_DRAW_FONT_MODEL_PREVIEW)
-		{
-			if (it->second->modelindex != GlobalText::Default.modelindex) {
-				TextDrawSetPreviewModel(text_id, it->second->modelindex);
-			}
-
-			if (it->second->fRotX != GlobalText::Default.fRotX || it->second->fRotY != GlobalText::Default.fRotY || it->second->fRotZ != GlobalText::Default.fRotZ || it->second->fZoom != GlobalText::Default.fZoom) {
-				TextDrawSetPreviewRot(text_id, it->second->fRotX, it->second->fRotY, it->second->fRotZ, it->second->fZoom);
-			}
-
-			if (it->second->veh_col1 != GlobalText::Default.veh_col1 || it->second->veh_col2 != GlobalText::Default.veh_col2) {
-				TextDrawSetPreviewVehCol( text_id, it->second->veh_col1, it->second->veh_col2);
-			}
-		}
-
-		it->second->real_id = text_id;
-	}
+	gText.clear();
+	gTextVisible.clear();
+	realToText.clear();
 }
 
  /***
@@ -152,142 +166,172 @@ void GlobalText::Reload(std::unordered_map<int, Text_Data*>::iterator it)
   *                             "Y88P"
   */
 
-DefaultText PlayerText::Default;
-std::unordered_map<int, std::unordered_map<int, Text_Data*>*> PlayerText::pText;
+const Text_Data PlayerText::Default{};
+std::array<TextMap*, MAX_PLAYERS> PlayerText::pText{};
+
+TextMap* PlayerText::Pool(int playerid)
+{
+	if (playerid < 0 || playerid >= MAX_PLAYERS) {
+		return nullptr;
+	}
+
+	return pText[playerid];
+}
+
+TextMap* PlayerText::Ensure(int playerid)
+{
+	if (playerid < 0 || playerid >= MAX_PLAYERS) {
+		return nullptr;
+	}
+
+	if (pText[playerid] == nullptr) {
+		pText[playerid] = new TextMap();
+	}
+
+	return pText[playerid];
+}
+
+Text_Data* PlayerText::Find(int playerid, int textid, const char* funcs)
+{
+	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
+		return nullptr;
+	}
+
+	TextMap* pool = Pool(playerid);
+	if (pool == nullptr)
+	{
+		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, funcs, playerid, textid);
+		return nullptr;
+	}
+
+	auto it = pool->find(textid);
+	if (it == pool->end())
+	{
+		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, funcs, playerid, textid);
+		return nullptr;
+	}
+
+	return &it->second;
+}
+
+void PlayerText::DestroyReal(int playerid, Text_Data& data)
+{
+	if (data.real_id == INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		return;
+	}
+
+	PlayerTextDrawDestroy(playerid, data.real_id);
+	data.real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+}
+
+bool PlayerText::Reload(int playerid, Text_Data& data)
+{
+	if (data.real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		return true;
+	}
+
+	const int text_id = CreatePlayerTextDraw(playerid, data.create_x, data.create_y, data.text.c_str());
+
+	// Past MAX_PLAYER_TEXT_DRAWS this comes back invalid. Storing it would leave
+	// real_id at 0xFFFF, which passes every "!= INVALID" test from then on.
+	if (text_id == INVALID_TEXT_DRAW) {
+		return false;
+	}
+
+	if (data.lettersize_x != Default.lettersize_x || data.lettersize_y != Default.lettersize_y) {
+		PlayerTextDrawLetterSize(playerid, text_id, data.lettersize_x, data.lettersize_y);
+	}
+
+	if (data.textsize_x != Default.textsize_x || data.textsize_y != Default.textsize_y) {
+		PlayerTextDrawTextSize(playerid, text_id, data.textsize_x, data.textsize_y);
+	}
+
+	if (data.alignment != Default.alignment) {
+		PlayerTextDrawAlignment(playerid, text_id, data.alignment);
+	}
+
+	if (data.color != Default.color) {
+		PlayerTextDrawColor(playerid, text_id, data.color);
+	}
+
+	if (data.usebox != Default.usebox) {
+		PlayerTextDrawUseBox(playerid, text_id, data.usebox);
+	}
+
+	if (data.boxcolor != Default.boxcolor) {
+		PlayerTextDrawBoxColor(playerid, text_id, data.boxcolor);
+	}
+
+	if (data.shadow != Default.shadow) {
+		PlayerTextDrawSetShadow(playerid, text_id, data.shadow);
+	}
+
+	if (data.outline != Default.outline) {
+		PlayerTextDrawSetOutline(playerid, text_id, data.outline);
+	}
+
+	if (data.backgroundcolor != Default.backgroundcolor) {
+		PlayerTextDrawBackgroundColor(playerid, text_id, data.backgroundcolor);
+	}
+
+	if (data.font != Default.font) {
+		PlayerTextDrawFont(playerid, text_id, data.font);
+	}
+
+	if (data.proportional != Default.proportional) {
+		PlayerTextDrawSetProportional(playerid, text_id, data.proportional);
+	}
+
+	if (data.selectable != Default.selectable) {
+		PlayerTextDrawSetSelectable(playerid, text_id, data.selectable);
+	}
+
+	if (data.font == TEXT_DRAW_FONT_MODEL_PREVIEW)
+	{
+		if (data.modelindex != Default.modelindex) {
+			PlayerTextDrawSetPreviewModel(playerid, text_id, data.modelindex);
+		}
+
+		if (data.fRotX != Default.fRotX || data.fRotY != Default.fRotY
+			|| data.fRotZ != Default.fRotZ || data.fZoom != Default.fZoom) {
+			PlayerTextDrawSetPreviewRot(playerid, text_id, data.fRotX, data.fRotY, data.fRotZ, data.fZoom);
+		}
+
+		if (data.veh_col1 != Default.veh_col1 || data.veh_col2 != Default.veh_col2) {
+			PlayerTextDrawSetPreviewVehCol(playerid, text_id, data.veh_col1, data.veh_col2);
+		}
+	}
+
+	data.real_id = text_id;
+	return true;
+}
 
 void PlayerText::Destroy(int playerid)
 {
-	if (playerid >= 0 && playerid < MAX_PLAYERS)
+	TextMap* pool = Pool(playerid);
+	if (pool == nullptr) {
+		return;
+	}
+
+	// The client drops every player textdraw on disconnect, so the server-side
+	// ones do not need destroying individually here.
+	delete pool;
+	pText[playerid] = nullptr;
+
+	slot_manager_player::reset_id(playerid);
+}
+
+void PlayerText::DestroyAll()
+{
+	for (int playerid = 0; playerid < MAX_PLAYERS; ++playerid)
 	{
-		// Eger veri yoksa alt islemleri calistirma
 		if (pText[playerid] == nullptr) {
-			return;
+			continue;
 		}
 
-		// Sadece oyuncu kimliginin icerigini temizle
-		for (auto p = pText[playerid]->begin(); p != pText[playerid]->end(); p++)
-		{
-			// Extra id kaldir
-			delete p->second->extra_id;
-
-			// Array verilerini kaldir
-			delete p->second->array_data;
-
-			// Data daki verileri kaldir
-			delete p->second;
-		}
-
-		// Pointeri kaldir
 		delete pText[playerid];
 		pText[playerid] = nullptr;
 
-		// Slot manager da ki kimlikleri temizle
 		slot_manager_player::reset_id(playerid);
-	}
-	else
-	{
-		// playerid degeri -1 ve alti olursa tum oyuncu havuzunu temizle
-		for (auto it = pText.begin(); it != pText.end(); it++)
-		{
-			if (pText[it->first] == nullptr) {
-				continue;
-			}
-
-			for (auto p = pText[it->first]->begin(); p != pText[it->first]->end(); p++)
-			{
-				// Extra id kaldir
-				delete p->second->extra_id;
-
-				// Array verilerini kaldir
-				delete p->second->array_data;
-
-				// Data daki verileri kaldir
-				delete p->second;
-			}
-
-			// Pointeri kaldir
-			delete pText[it->first];
-			pText[playerid] = nullptr;
-
-			// Slot manager da ki kimlikleri temizle
-			slot_manager_player::reset_id(it->first);
-		}
-
-		// Tum pointer listesini temizle
-		pText.clear();
-	}
-}
-
-void PlayerText::Reload(int playerid, std::unordered_map<int, Text_Data*>::iterator it)
-{
-	if (it->second->real_id == INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		int text_id = CreatePlayerTextDraw(playerid, it->second->create_x, it->second->create_y, it->second->text.c_str());
-
-		if (it->second->lettersize_x != PlayerText::Default.lettersize_x || it->second->lettersize_y != PlayerText::Default.lettersize_y) {
-			PlayerTextDrawLetterSize(playerid, text_id, it->second->lettersize_x, it->second->lettersize_y);
-		}
-
-		if (it->second->textsize_x != PlayerText::Default.textsize_x || it->second->textsize_y != PlayerText::Default.textsize_y) {
-			PlayerTextDrawTextSize(playerid, text_id, it->second->textsize_x, it->second->textsize_y);
-		}
-
-		if (it->second->alignment != PlayerText::Default.alignment) {
-			PlayerTextDrawAlignment(playerid, text_id, it->second->alignment);
-		}
-
-		if (it->second->color != PlayerText::Default.color) {
-			PlayerTextDrawColor(playerid, text_id, it->second->color);
-		}
-
-		if (it->second->usebox != PlayerText::Default.usebox) {
-			PlayerTextDrawUseBox(playerid, text_id, it->second->usebox);
-		}
-
-		if (it->second->boxcolor != PlayerText::Default.boxcolor) {
-			PlayerTextDrawBoxColor(playerid, text_id, it->second->boxcolor);
-		}
-
-		if (it->second->shadow != PlayerText::Default.shadow) {
-			PlayerTextDrawSetShadow(playerid, text_id, it->second->shadow);
-		}
-
-		if (it->second->outline != PlayerText::Default.outline) {
-			PlayerTextDrawSetOutline(playerid, text_id, it->second->outline);
-		}
-
-		if (it->second->backgroundcolor != PlayerText::Default.backgroundcolor) {
-			PlayerTextDrawBackgroundColor(playerid, text_id, it->second->backgroundcolor);
-		}
-
-		if (it->second->font != PlayerText::Default.font) {
-			PlayerTextDrawFont(playerid, text_id, it->second->font);
-		}
-
-		if (it->second->proportional != PlayerText::Default.proportional) {
-			PlayerTextDrawSetProportional(playerid, text_id, it->second->proportional);
-		}
-
-		if (it->second->selectable != PlayerText::Default.selectable) {
-			PlayerTextDrawSetSelectable(playerid, text_id, it->second->selectable);
-		}
-
-		if (it->second->font == TEXT_DRAW_FONT_MODEL_PREVIEW)
-		{
-			if (it->second->modelindex != PlayerText::Default.modelindex) {
-				PlayerTextDrawSetPreviewModel(playerid, text_id, it->second->modelindex);
-			}
-
-			if (it->second->fRotX != PlayerText::Default.fRotX || it->second->fRotY != PlayerText::Default.fRotY || it->second->fRotZ != PlayerText::Default.fRotZ || it->second->fZoom != PlayerText::Default.fZoom) {
-				PlayerTextDrawSetPreviewRot(playerid, text_id, it->second->fRotX, it->second->fRotY, it->second->fRotZ, it->second->fZoom);
-			}
-
-			if (it->second->veh_col1 != PlayerText::Default.veh_col1 || it->second->veh_col2 != PlayerText::Default.veh_col2) {
-				PlayerTextDrawSetPreviewVehCol(playerid, text_id, it->second->veh_col1, it->second->veh_col2);
-			}
-		}
-
-		it->second->real_id = text_id;
-		PlayerTextDrawShow(playerid, it->second->real_id);
 	}
 }

@@ -10,7 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
-
+/build_verify
 # Compiled Dynamic libraries
 *.so
 *.dylib

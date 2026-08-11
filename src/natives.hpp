@@ -18,10 +18,23 @@
 
 #include "sampgdk.hpp"
 
+// Exact arity check for the fixed-signature natives.
 #define CHECK_PARAMS(n) \
-	if (params[0] != (n * 4)) \
+	if (params[0] != static_cast<cell>((n) * sizeof(cell))) \
 	{ \
-		sampgdk::logprintf("%s: Expecting %d parameter(s), but found %d.", __func__, n, params[0] / sizeof(cell)); \
+		sampgdk::logprintf("%s: Expecting %d parameter(s), but found %d.", \
+			__func__, static_cast<int>(n), static_cast<int>(params[0] / sizeof(cell))); \
+		return 0; \
+	}
+
+// Minimum arity check for the variadic natives. These previously used
+// CHECK_PARAMS(params[0] / sizeof(cell)), which is always satisfied and so let a
+// call with too few arguments read past the end of the parameter array.
+#define CHECK_MIN_PARAMS(n) \
+	if (params[0] < static_cast<cell>((n) * sizeof(cell))) \
+	{ \
+		sampgdk::logprintf("%s: Expecting at least %d parameter(s), but found %d.", \
+			__func__, static_cast<int>(n), static_cast<int>(params[0] / sizeof(cell))); \
 		return 0; \
 	}
 

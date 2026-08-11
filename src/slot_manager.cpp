@@ -29,23 +29,23 @@
   */
 
 int slot_manager_global::next_Id;
-std::priority_queue<int, std::vector<int>, std::greater<int>> slot_manager_global::global_ids;
+IdHeap slot_manager_global::global_ids;
 
 int slot_manager_global::get_id()
 {
-	if (slot_manager_global::global_ids.empty()) {
-		return 1 + slot_manager_global::next_Id++;
+	if (global_ids.empty()) {
+		return 1 + next_Id++;
 	}
 
-	int low_id = slot_manager_global::global_ids.top();
-	slot_manager_global::global_ids.pop();
-	
+	const int low_id = global_ids.top();
+	global_ids.pop();
+
 	return low_id;
 }
 
 void slot_manager_global::remove_id(int value)
 {
-	slot_manager_global::global_ids.push(value);
+	global_ids.push(value);
 }
 
 
@@ -63,28 +63,40 @@ void slot_manager_global::remove_id(int value)
   *                             "Y88P"
   */
 
-std::map<int, int> slot_manager_player::next_Id;
-std::map<int, std::priority_queue<int, std::vector<int>, std::greater<int>>> slot_manager_player::p_Ids;
+std::array<int, MAX_PLAYERS> slot_manager_player::next_Id{};
+std::array<IdHeap, MAX_PLAYERS> slot_manager_player::p_Ids;
 
 int slot_manager_player::get_id(int playerid)
 {
-	if (slot_manager_player::p_Ids[playerid].empty()) {
-		return 1 + slot_manager_player::next_Id[playerid]++;
+	if (playerid < 0 || playerid >= MAX_PLAYERS) {
+		return 0;
 	}
 
-	int low_id = slot_manager_player::p_Ids[playerid].top();
-	slot_manager_player::p_Ids[playerid].pop();
+	if (p_Ids[playerid].empty()) {
+		return 1 + next_Id[playerid]++;
+	}
+
+	const int low_id = p_Ids[playerid].top();
+	p_Ids[playerid].pop();
 
 	return low_id;
 }
 
 void slot_manager_player::remove_id(int playerid, int value)
 {
-	slot_manager_player::p_Ids[playerid].push(value);
+	if (playerid < 0 || playerid >= MAX_PLAYERS) {
+		return;
+	}
+
+	p_Ids[playerid].push(value);
 }
 
 void slot_manager_player::reset_id(int playerid)
 {
-	slot_manager_player::next_Id[playerid] = 0;
-	slot_manager_player::p_Ids[playerid] = std::priority_queue<int, std::vector<int>, std::greater<int>>();
+	if (playerid < 0 || playerid >= MAX_PLAYERS) {
+		return;
+	}
+
+	next_Id[playerid] = 0;
+	p_Ids[playerid] = IdHeap();
 }

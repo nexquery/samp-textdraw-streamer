@@ -16,27 +16,36 @@
 
 #pragma once
 
-#include <map>
+#include <array>
 #include <queue>
+#include <vector>
+
+#include "sampgdk.hpp"
+
+// Hands out the smallest free streamer id, so ids stay dense as textdraws are
+// created and destroyed.
+using IdHeap = std::priority_queue<int, std::vector<int>, std::greater<int>>;
 
 class slot_manager_player
 {
 public:
-	static int get_id(int playerid);
-	static void remove_id(int playerid, int value);
-	static void reset_id(int playerid);
+	// Returns 0 when playerid is out of range; ids otherwise start at 1.
+	static int	get_id(int playerid);
+	static void	remove_id(int playerid, int value);
+	static void	reset_id(int playerid);
 
 private:
-	static std::map<int, int> next_Id;
-	static std::map<int, std::priority_queue<int, std::vector<int>, std::greater<int>>> p_Ids;
+	static std::array<int, MAX_PLAYERS>		next_Id;
+	static std::array<IdHeap, MAX_PLAYERS>	p_Ids;
 };
 
 class slot_manager_global
 {
 public:
-	static int get_id();
-	static void remove_id(int value);
+	static int	get_id();
+	static void	remove_id(int value);
+
 private:
-	static int next_Id;
-	static std::priority_queue<int, std::vector<int>, std::greater<int>> global_ids;
+	static int		next_Id;
+	static IdHeap	global_ids;
 };

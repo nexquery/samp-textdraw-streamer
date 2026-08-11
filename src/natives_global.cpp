@@ -24,52 +24,17 @@
  //
 cell AMX_NATIVE_CALL Natives::CreateDynamicTextDraw(AMX* amx, cell* params)
 {
-	// Parametreler
-	CHECK_PARAMS(params[0] / sizeof(cell));
+	CHECK_MIN_PARAMS(3);
 
-	// Textdraw kimliði oluþtur
-	int auto_increment = slot_manager_global::get_id();
+	const int textid = slot_manager_global::get_id();
 
-	// Extra ID oluþtur
-	std::map<int, int>* map = new std::map<int, int>();
+	Text_Data& data = GlobalText::gText[textid];
+	data = Text_Data();
+	data.create_x = amx_ctof(params[1]);
+	data.create_y = amx_ctof(params[2]);
+	data.text = service::formattedString(amx, params, 3, 4);
 
-	// Array Data'yý oluþtur
-	std::vector<int>* arr = new std::vector<int>();
-
-	// Textdraw verilerini oluþtur
-	Text_Data* data			= new Text_Data();
-	data->real_id			= -1;
-	data->create_x			= amx_ctof(params[1]);
-	data->create_y			= amx_ctof(params[2]);
-	data->text				= service::formattedString(amx, params, 3, 4);
-	data->lettersize_x		= 0.0;
-	data->lettersize_y		= 0.0;
-	data->textsize_x		= 0.0;
-	data->textsize_y		= 0.0;
-	data->alignment			= 1;
-	data->color				= -2;
-	data->usebox			= 0;
-	data->boxcolor			= -2;
-	data->shadow			= 2;
-	data->outline			= 0;
-	data->backgroundcolor	= -2;
-	data->font				= 1;
-	data->proportional		= 1;
-	data->selectable		= 0;
-	data->modelindex		= 0;
-	data->fRotX				= 0.0;
-	data->fRotY				= 0.0;
-	data->fRotZ				= 0.0;
-	data->fZoom				= 1.0;
-	data->veh_col1			= -2;
-	data->veh_col2			= -2;
-	data->extra_id			= map;
-	data->float_data		= 0.0;
-	data->array_data		= arr;
-
-	// Verileri kaydet
-	GlobalText::gText->emplace(auto_increment, data);
-	return static_cast<cell>(auto_increment);
+	return static_cast<cell>(textid);
 }
 
 //
@@ -78,42 +43,24 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicTextDraw(AMX* amx, cell* params)
 cell AMX_NATIVE_CALL Natives::DestroyDynamicTextDraw(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
-	
-	int 
-		textid = static_cast<int>(params[1]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) 
-	{
-		TextDrawDestroy(it->second->real_id), it->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
-	}
+	GlobalText::DestroyReal(*data);
 
-	// Auto Increment
 	slot_manager_global::remove_id(textid);
 
-	// Visible
-	GlobalText::gTextVisible[textid].clear();
+	// Erase the outer entry too: clearing only the inner set left one empty set
+	// behind per textdraw ever created.
+	GlobalText::gTextVisible.erase(textid);
+	GlobalText::gText.erase(textid);
 
-	// Extra Id
-	delete it->second->extra_id;
-
-	// Array Data
-	delete it->second->array_data;
-
-	// Text data
-	delete it->second;
-
-	// Iterator
-	GlobalText::gText->erase(it);
 	return 1;
 }
 
@@ -124,29 +71,19 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawLetterSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
 
-	int 
-		textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	float
-		width = amx_ctof(params[2]),
-		height = amx_ctof(params[3]);
-
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->lettersize_x = width;
-	it->second->lettersize_y = height;
+	data->lettersize_x = amx_ctof(params[2]);
+	data->lettersize_y = amx_ctof(params[3]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawLetterSize(it->second->real_id, it->second->lettersize_x, it->second->lettersize_y);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawLetterSize(data->real_id, data->lettersize_x, data->lettersize_y);
 	}
 
 	return 1;
@@ -159,29 +96,19 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawTextSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
 
-	int
-		textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	float
-		width = amx_ctof(params[2]),
-		height = amx_ctof(params[3]);
-
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->textsize_x = width;
-	it->second->textsize_y = height;
+	data->textsize_x = amx_ctof(params[2]);
+	data->textsize_y = amx_ctof(params[3]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawTextSize(it->second->real_id, it->second->textsize_x, it->second->textsize_y);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawTextSize(data->real_id, data->textsize_x, data->textsize_y);
 	}
 
 	return 1;
@@ -194,25 +121,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawAlignment(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		alignment = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->alignment = static_cast<int>(params[2]);
+	data->alignment = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawAlignment(it->second->real_id, it->second->alignment);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawAlignment(data->real_id, data->alignment);
 	}
 
 	return 1;
@@ -225,25 +145,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		textColour = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->color = textColour;
+	data->color = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawColor(it->second->real_id, it->second->color);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawColor(data->real_id, data->color);
 	}
 
 	return 1;
@@ -256,25 +169,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawUseBox(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		enableBox = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->usebox = enableBox;
+	data->usebox = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawUseBox(it->second->real_id, it->second->usebox);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawUseBox(data->real_id, data->usebox);
 	}
 
 	return 1;
@@ -287,27 +193,20 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawBoxColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		boxColour = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->boxcolor = boxColour;
+	data->boxcolor = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawBoxColor(it->second->real_id, it->second->boxcolor);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawBoxColor(data->real_id, data->boxcolor);
 	}
-	
+
 	return 1;
 }
 
@@ -318,25 +217,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetShadow(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		shadowSize = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->shadow = shadowSize;
+	data->shadow = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetShadow(it->second->real_id, it->second->shadow);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetShadow(data->real_id, data->shadow);
 	}
 
 	return 1;
@@ -349,25 +241,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetOutline(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		outlineSize = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->outline = outlineSize;
+	data->outline = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetOutline(it->second->real_id, it->second->outline);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetOutline(data->real_id, data->outline);
 	}
 
 	return 1;
@@ -380,25 +265,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawBackgroundColour(AMX* amx, cell* pa
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		backgroundColour = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->backgroundcolor = backgroundColour;
+	data->backgroundcolor = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawBackgroundColor(it->second->real_id, it->second->backgroundcolor);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawBackgroundColor(data->real_id, data->backgroundcolor);
 	}
 
 	return 1;
@@ -411,25 +289,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawFont(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		font = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->font = font;
+	data->font = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawFont(it->second->real_id, it->second->font);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawFont(data->real_id, data->font);
 	}
 
 	return 1;
@@ -442,25 +313,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetProportional(AMX* amx, cell* par
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		proportional = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->proportional = proportional;
+	data->proportional = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetProportional(it->second->real_id, it->second->proportional);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetProportional(data->real_id, data->proportional);
 	}
 
 	return 1;
@@ -473,25 +337,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetSelectable(AMX* amx, cell* param
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		selectable = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->selectable = selectable;
+	data->selectable = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetSelectable(it->second->real_id, it->second->selectable);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetSelectable(data->real_id, data->selectable);
 	}
 
 	return 1;
@@ -503,44 +360,31 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetSelectable(AMX* amx, cell* param
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawShowForPlayer(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
-	
-	int 
-		playerid = static_cast<int>(params[1]), 
-		textid = static_cast<int>(params[2]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
+	const int playerid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[2]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	// Gösterilecek oyuncu sunucuda yoksa alt fonksiyonlarý çalýþtýrma
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	if (GlobalText::gTextVisible[textid].empty())
+	// Reload is a no-op when the textdraw is already allocated server-side.
+	if (!GlobalText::Reload(textid, *data))
 	{
-		GlobalText::Reload(it);
-		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-		{
-			GlobalText::gTextVisible[textid][playerid] = true;
-			TextDrawShowForPlayer(playerid, it->second->real_id);
-		}
-	}
-	else
-	{
-		GlobalText::gTextVisible[textid][playerid] = true;
-		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-		{
-			TextDrawShowForPlayer(playerid, it->second->real_id);
-		}
+		Plugin_Settings::ILogger(LogType::SHOW_LIMIT_GLOBAL, __func__, playerid, textid);
+		return 0;
 	}
 
+	GlobalText::gTextVisible[textid].insert(playerid);
+	data->visible = true;
+
+	TextDrawShowForPlayer(playerid, data->real_id);
 	return 1;
 }
 
@@ -550,34 +394,32 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawShowForPlayer(AMX* amx, cell* param
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawHideForPlayer(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
-	
-	int 
-		playerid = static_cast<int>(params[1]),
-		textid = static_cast<int>(params[2]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
+	const int playerid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[2]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	std::map<int, bool>::iterator p = GlobalText::gTextVisible[textid].find(playerid);
+	std::unordered_set<int>& viewers = GlobalText::gTextVisible[textid];
+	viewers.erase(playerid);
 
-	if (p != GlobalText::gTextVisible[textid].end()) {
-		GlobalText::gTextVisible[textid].erase(p);
-	}
-
-	if (!GlobalText::gTextVisible[textid].empty())
+	if (!viewers.empty())
 	{
-		TextDrawHideForPlayer(playerid, it->second->real_id);
+		if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+			TextDrawHideForPlayer(playerid, data->real_id);
+		}
 	}
 	else
 	{
-		TextDrawDestroy(it->second->real_id), it->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+		// Nobody is looking at it any more, so give the slot back to the server.
+		// DestroyReal is a no-op when no server-side textdraw exists, which the
+		// unguarded TextDrawDestroy here previously was not.
+		GlobalText::DestroyReal(*data);
+		data->visible = false;
 	}
 
 	return 1;
@@ -590,48 +432,29 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawShowForAll(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	// Sunucuda bir oyuncu yoksa bu fonksiyonu çalýþtýrmayý durdur
 	if (GlobalText::PlayerList.empty()) {
 		return 0;
 	}
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	// Aktif gözüken bir kullanýcý yoksa textdrawý yeniden oluþtur
-	if (GlobalText::gTextVisible[textid].empty())
+	if (!GlobalText::Reload(textid, *data))
 	{
-		// TextDraw'ý oluþtur
-		GlobalText::Reload(it);
-
-		// TextDraw oluþturulduysa
-		if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-		{
-			// Tüm oyuncularý gözüküyor olarak ayarla
-			for (std::unordered_set<int>::iterator p = GlobalText::PlayerList.begin(); p != GlobalText::PlayerList.end(); p++)
-			{
-				GlobalText::gTextVisible[textid][*p] = true;
-			}
-
-			// TextDrawý göster
-			TextDrawShowForAll(it->second->real_id);
-		}
-	}
-	else
-	{
-		// Zaten gözüken oyuncu olduðu için gerçek kimlik ile tekrar göster
-		TextDrawShowForAll(it->second->real_id);
+		Plugin_Settings::ILogger(LogType::SHOW_LIMIT_GLOBAL, __func__, INVALID_PLAYER_ID, textid);
+		return 0;
 	}
 
+	std::unordered_set<int>& viewers = GlobalText::gTextVisible[textid];
+	viewers.insert(GlobalText::PlayerList.begin(), GlobalText::PlayerList.end());
+	data->visible = true;
+
+	TextDrawShowForAll(data->real_id);
 	return 1;
 }
 
@@ -642,24 +465,17 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawHideForAll(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-	
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
-	
-	// Tüm kullanýcýlarý sýfýrla
-	GlobalText::gTextVisible[textid].clear();
 
-	// TextDraw'ý kaldýr
-	TextDrawDestroy(it->second->real_id);
-	it->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+	GlobalText::gTextVisible[textid].clear();
+	GlobalText::DestroyReal(*data);
+	data->visible = false;
 
 	return 1;
 }
@@ -669,22 +485,19 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawHideForAll(AMX* amx, cell* params)
 //
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetString(AMX* amx, cell* params)
 {
-	CHECK_PARAMS(params[0] / sizeof(cell));
+	CHECK_MIN_PARAMS(2);
 
-	int textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->text = service::formattedString(amx, params, 2, 3);
+	data->text = service::formattedString(amx, params, 2, 3);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetString(it->second->real_id, it->second->text.c_str());
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetString(data->real_id, data->text.c_str());
 	}
 
 	return 1;
@@ -697,25 +510,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetPreviewModel(AMX* amx, cell* par
 {
 	CHECK_PARAMS(4);
 
-	int
-		textid = static_cast<int>(params[1]),
-		model = static_cast<int>(params[2]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->modelindex = model;
+	data->modelindex = static_cast<int>(params[2]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetPreviewModel(it->second->real_id, it->second->modelindex);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetPreviewModel(data->real_id, data->modelindex);
 	}
 
 	return 1;
@@ -728,33 +534,21 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetPreviewRot(AMX* amx, cell* param
 {
 	CHECK_PARAMS(7);
 
-	int
-		textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[6], params[7]);
 
-	float
-		rotationX	= amx_ctof(params[2]),
-		rotationY	= amx_ctof(params[3]),
-		rotationZ	= amx_ctof(params[4]),
-		zoom		= amx_ctof(params[5]);
-
-	Plugin_Settings::file = service::getString(amx, params[6]);
-	Plugin_Settings::line = static_cast<int>(params[7]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->fRotX = rotationX;
-	it->second->fRotY = rotationY;
-	it->second->fRotZ = rotationZ;
-	it->second->fZoom = zoom;
+	data->fRotX = amx_ctof(params[2]);
+	data->fRotY = amx_ctof(params[3]);
+	data->fRotZ = amx_ctof(params[4]);
+	data->fZoom = amx_ctof(params[5]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetPreviewRot(it->second->real_id, it->second->fRotX, it->second->fRotY, it->second->fRotZ, it->second->fZoom);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetPreviewRot(data->real_id, data->fRotX, data->fRotY, data->fRotZ, data->fZoom);
 	}
 
 	return 1;
@@ -767,27 +561,19 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetPreviewVehicleColours(AMX* amx, 
 {
 	CHECK_PARAMS(5);
 
-	int
-		textid = static_cast<int>(params[1]),
-		colour1 = static_cast<int>(params[2]),
-		colour2 = static_cast<int>(params[3]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->veh_col1 = colour1;
-	it->second->veh_col2 = colour2;
+	data->veh_col1 = static_cast<int>(params[2]);
+	data->veh_col2 = static_cast<int>(params[3]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
-	{
-		TextDrawSetPreviewVehCol(it->second->real_id, it->second->veh_col1, it->second->veh_col2);
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW) {
+		TextDrawSetPreviewVehCol(data->real_id, data->veh_col1, data->veh_col2);
 	}
 
 	return 1;
@@ -799,8 +585,7 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetPreviewVehicleColours(AMX* amx, 
 cell AMX_NATIVE_CALL Natives::IsValidDynamicTextDraw(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(1);
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(static_cast<int>(params[1]));
-	return it != GlobalText::gText->end();
+	return GlobalText::gText.find(static_cast<int>(params[1])) != GlobalText::gText.end();
 }
 
 //
@@ -809,28 +594,21 @@ cell AMX_NATIVE_CALL Natives::IsValidDynamicTextDraw(AMX* amx, cell* params)
 cell AMX_NATIVE_CALL Natives::IsDynamicTextDrawVisibleForPlayer(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
-	
-	int 
-		playerid = static_cast<int>(params[1]), 
-		textid = static_cast<int>(params[2]);
 
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
+	const int playerid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[2]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	if (GlobalText::Find(textid, __func__) == nullptr) {
 		return 0;
 	}
 
-	std::map<int, bool>::iterator p = GlobalText::gTextVisible[textid].find(playerid);
-	if (p == GlobalText::gTextVisible[textid].end())
-	{
+	auto viewers = GlobalText::gTextVisible.find(textid);
+	if (viewers == GlobalText::gTextVisible.end()) {
 		return 0;
 	}
 
-	return 1;
+	return viewers->second.find(playerid) != viewers->second.end();
 }
 
 //
@@ -840,17 +618,12 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetString(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setString(amx, params[2], params[3], it->second->text.c_str());
-	return 1;
+	return service::setString(amx, params[2], params[3], data->text);
 }
 
 //
@@ -860,36 +633,43 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawSetPos(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
 
-	int
-		textid = static_cast<int>(params[1]);
+	const int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	float
-		x = amx_ctof(params[2]),
-		y = amx_ctof(params[3]);
-
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(textid, __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	it->second->create_x = x;
-	it->second->create_y = y;
+	data->create_x = amx_ctof(params[2]);
+	data->create_y = amx_ctof(params[3]);
 
-	if (it->second->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
+	// Position is fixed at creation time, so an existing textdraw has to be
+	// rebuilt for the move to take effect.
+	if (data->real_id != INVALID_DYNAMIC_PLAYER_TEXTDRAW)
 	{
-		TextDrawDestroy(it->second->real_id);
-		it->second->real_id = INVALID_DYNAMIC_PLAYER_TEXTDRAW;
+		const bool wasVisible = data->visible;
 
-		GlobalText::Reload(it);
+		GlobalText::DestroyReal(*data);
 
-		for (std::unordered_set<int>::iterator p = GlobalText::PlayerList.begin(); p != GlobalText::PlayerList.end(); p++)
+		if (!GlobalText::Reload(textid, *data))
 		{
-			TextDrawShowForPlayer(*p, it->second->real_id);
+			Plugin_Settings::ILogger(LogType::SHOW_LIMIT_GLOBAL, __func__, INVALID_PLAYER_ID, textid);
+			return 0;
+		}
+
+		// Re-show only to the players who could already see it. Showing it to
+		// everyone in PlayerList, as this used to, made a move reveal a textdraw
+		// to players it was never shown to.
+		if (wasVisible)
+		{
+			auto viewers = GlobalText::gTextVisible.find(textid);
+			if (viewers != GlobalText::gTextVisible.end())
+			{
+				for (int viewer : viewers->second) {
+					TextDrawShowForPlayer(viewer, data->real_id);
+				}
+			}
 		}
 	}
 
@@ -903,20 +683,15 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetLetterSize(AMX* amx, cell* param
 {
 	CHECK_PARAMS(5);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setFloat(amx, params[2], it->second->lettersize_x);
-	service::setFloat(amx, params[3], it->second->lettersize_y);
+	service::setFloat(amx, params[2], data->lettersize_x);
+	service::setFloat(amx, params[3], data->lettersize_y);
 
 	return 1;
 }
@@ -928,20 +703,15 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetTextSize(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setFloat(amx, params[2], it->second->textsize_x);
-	service::setFloat(amx, params[3], it->second->textsize_y);
+	service::setFloat(amx, params[2], data->textsize_x);
+	service::setFloat(amx, params[3], data->textsize_y);
 
 	return 1;
 }
@@ -953,20 +723,15 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPos(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setFloat(amx, params[2], it->second->create_x);
-	service::setFloat(amx, params[3], it->second->create_y);
+	service::setFloat(amx, params[2], data->create_x);
+	service::setFloat(amx, params[3], data->create_y);
 
 	return 1;
 }
@@ -978,19 +743,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->color);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->color);
 }
 
 //
@@ -1000,41 +756,23 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetBoxColour(AMX* amx, cell* params
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->boxcolor);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->boxcolor);
 }
 
 //
-// native DynamicTextDrawGetBackgroundCol(Text:textid, const file[], line);
+// native DynamicTextDrawGetBackgroundCo(Text:textid, const file[], line);
 //
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetBackgroundColour(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->backgroundcolor);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->backgroundcolor);
 }
 
 //
@@ -1044,19 +782,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetShadow(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->shadow);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->shadow);
 }
 
 //
@@ -1066,19 +795,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetOutline(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->outline);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->outline);
 }
 
 //
@@ -1088,19 +808,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetFont(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->font);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->font);
 }
 
 //
@@ -1110,19 +821,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawIsBox(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->usebox);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->usebox);
 }
 
 //
@@ -1132,19 +834,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawIsProportional(AMX* amx, cell* para
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->proportional);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->proportional);
 }
 
 //
@@ -1154,19 +847,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawIsSelectable(AMX* amx, cell* params
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->selectable);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->selectable);
 }
 
 //
@@ -1176,19 +860,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetAlignment(AMX* amx, cell* params
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->alignment);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->alignment);
 }
 
 //
@@ -1198,19 +873,10 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewModel(AMX* amx, cell* par
 {
 	CHECK_PARAMS(3);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[2], params[3]);
 
-	Plugin_Settings::file = service::getString(amx, params[2]);
-	Plugin_Settings::line = static_cast<int>(params[3]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-		return 0;
-	}
-
-	return static_cast<int>(it->second->modelindex);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	return (data == nullptr) ? 0 : static_cast<cell>(data->modelindex);
 }
 
 //
@@ -1219,23 +885,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewModel(AMX* amx, cell* par
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewRot(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(7);
-	
-	int textid = static_cast<int>(params[1]);
 
-	Plugin_Settings::file = service::getString(amx, params[6]);
-	Plugin_Settings::line = static_cast<int>(params[7]);
+	Plugin_Settings::SetContext(amx, params[6], params[7]);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
-	
-	service::setFloat(amx, params[2], it->second->fRotX);
-	service::setFloat(amx, params[3], it->second->fRotY);
-	service::setFloat(amx, params[4], it->second->fRotZ);
-	service::setFloat(amx, params[5], it->second->fZoom);
+
+	service::setFloat(amx, params[2], data->fRotX);
+	service::setFloat(amx, params[3], data->fRotY);
+	service::setFloat(amx, params[4], data->fRotZ);
+	service::setFloat(amx, params[5], data->fZoom);
 
 	return 1;
 }
@@ -1247,20 +908,15 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetPreviewVehicleColours(AMX* amx, 
 {
 	CHECK_PARAMS(5);
 
-	int textid = static_cast<int>(params[1]);
+	Plugin_Settings::SetContext(amx, params[4], params[5]);
 
-	Plugin_Settings::file = service::getString(amx, params[4]);
-	Plugin_Settings::line = static_cast<int>(params[5]);
-
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setInt(amx, params[2], it->second->veh_col1);
-	service::setInt(amx, params[3], it->second->veh_col2);
+	service::setInt(amx, params[2], data->veh_col1);
+	service::setInt(amx, params[3], data->veh_col2);
 
 	return 1;
 }
@@ -1272,26 +928,25 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetRealID(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
 
-	int textid = static_cast<int>(params[1]);
-
-	Plugin_Settings::file = service::getString(amx, params[3]);
-	Plugin_Settings::line = static_cast<int>(params[4]);
+	Plugin_Settings::SetContext(amx, params[3], params[4]);
 
 	service::setInt(amx, params[2], INVALID_DYNAMIC_PLAYER_TEXTDRAW);
 
-	std::unordered_map<int, Text_Data*>::iterator it = GlobalText::gText->find(textid);
-	if (it == GlobalText::gText->end())
-	{
-		Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
+	Text_Data* data = GlobalText::Find(static_cast<int>(params[1]), __func__);
+	if (data == nullptr) {
 		return 0;
 	}
 
-	service::setInt(amx, params[2], it->second->real_id);
+	service::setInt(amx, params[2], data->real_id);
 
 	return 1;
 }
 
+//
+// native DynamicTextDrawGetSize();
+//
 cell AMX_NATIVE_CALL Natives::DynamicTextDrawGetSize(AMX* amx, cell* params)
 {
-	return (GlobalText::gText->empty()) ? (0) : (GlobalText::gText->size());
+	CHECK_PARAMS(0);
+	return static_cast<cell>(GlobalText::gText.size());
 }

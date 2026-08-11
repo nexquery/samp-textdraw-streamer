@@ -18,55 +18,50 @@
 #include "natives.hpp"
 #include "service.hpp"
 
+#include <algorithm>
+
+namespace
+{
+	// Resolves either flavour of textdraw behind the type discriminator.
+	//
+	// The player branch previously did PlayerText::pText[playerid]->find(...) with
+	// no null check, which segfaulted the server for any player who had not yet
+	// created a player textdraw. PlayerText::Find performs the same guard sequence
+	// and logging as every other player native.
+	Text_Data* resolve(int type, int textid, int playerid, const char* funcs)
+	{
+		if (type == TDStreamer_Type::GLOBAL) {
+			return GlobalText::Find(textid, funcs);
+		}
+
+		if (type == TDStreamer_Type::PLAYER) {
+			return PlayerText::Find(playerid, textid, funcs);
+		}
+
+		Plugin_Settings::ILogger(LogType::INVALID_TYPE, funcs, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+		return nullptr;
+	}
+}
+
  //
  // native DynamicTextDraw_SetIntData(DYNAMIC_TEXTDRAW_TYPE:type, {Text, PlayerText}:textid, index, value, playerid = -1);
  //
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(5);
-	
-	int
-		type		= params[1],
-		textid		= params[2],
-		index		= params[3],
-		value		= params[4],
-		playerid	= params[5];
-	
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
 
-		std::map<int, int>* address = it->second->extra_id;
-		(*address)[index] = value;
-		return 1;
-	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[5]),
+		__func__);
 
-			std::map<int, int>* address = it->second->extra_id;
-			(*address)[index] = value;
-			return 1;
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	if (data == nullptr) {
+		return 0;
 	}
 
-	return 0;
+	data->extra_id[static_cast<int>(params[3])] = static_cast<int>(params[4]);
+	return 1;
 }
 
 //
@@ -75,46 +70,20 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetIntData(AMX* amx, cell* params)
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(4);
-	
-	int
-		type		= params[1],
-		textid		= params[2],
-		index		= params[3],
-		playerid	= params[4];
-	
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
 
-		std::map<int, int>* address = (std::map<int, int>*)it->second->extra_id;
-		return (*address)[index];
-	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[4]),
+		__func__);
 
-			std::map<int, int>* address = it->second->extra_id;
-			return (*address)[index];
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	if (data == nullptr) {
+		return 0;
 	}
 
-	return 0;
+	// Deliberately does not insert on a miss, unlike the operator[] this replaces.
+	auto it = data->extra_id.find(static_cast<int>(params[3]));
+	return (it == data->extra_id.end()) ? 0 : static_cast<cell>(it->second);
 }
 
 //
@@ -123,49 +92,19 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetIntData(AMX* amx, cell* params)
 cell AMX_NATIVE_CALL Natives::DynamicTextDraw_ClearIntData(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(3);
-	
-	int
-		type		= params[1],
-		textid		= params[2],
-		playerid	= params[3];
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[3]),
+		__func__);
 
-		delete it->second->extra_id;
-		std::map<int, int>* address = new std::map<int, int>();
-		it->second->extra_id = address;
-		return 1;
-	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
-
-			delete it->second->extra_id;
-			std::map<int, int>* address = new std::map<int, int>();
-			it->second->extra_id = address;
-			return 1;
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	if (data == nullptr) {
+		return 0;
 	}
 
-	return 0;
+	data->extra_id.clear();
+	return 1;
 }
 
 //
@@ -175,44 +114,18 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetFloatData(AMX* amx, cell* param
 {
 	CHECK_PARAMS(4);
 
-	int		type		= params[1];
-	int		textid		= params[2];
-	float	value		= amx_ctof(params[3]);
-	int		playerid	= params[4];
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[4]),
+		__func__);
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
-
-		it->second->float_data = value;
-		return 1;
-	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
-
-			it->second->float_data = value;
-			return 1;
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+	if (data == nullptr) {
+		return 0;
 	}
 
-	return 0;
+	data->float_data = amx_ctof(params[3]);
+	return 1;
 }
 
 //
@@ -222,38 +135,17 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetFloatData(AMX* amx, cell* param
 {
 	CHECK_PARAMS(3);
 
-	int		type		= params[1];
-	int		textid		= params[2];
-	int		playerid	= params[3];
-	float	value		= 0.0;
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[3]),
+		__func__);
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return amx_ftoc(value);
-		}
-		return amx_ftoc(it->second->float_data);
+	float value = 0.0f;
+	if (data != nullptr) {
+		value = data->float_data;
 	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return amx_ftoc(value);
-			}
-			return amx_ftoc(it->second->float_data);
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
-	}
+
 	return amx_ftoc(value);
 }
 
@@ -264,56 +156,29 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_SetArrayData(AMX* amx, cell* param
 {
 	CHECK_PARAMS(5);
 
-	int	type		= params[1];
-	int	textid		= params[2];
-	int	playerid	= params[4];
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[4]),
+		__func__);
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
+	if (data == nullptr) {
+		return 0;
+	}
 
-		it->second->array_data->clear();
-
-		cell* array = NULL;
-		amx_GetAddr(amx, params[3], &array);
-		for (int i = 0, j = static_cast<int>(params[5]); i != j; ++i)
-		{
-			it->second->array_data->push_back(static_cast<int>(array[i]));
-		}
+	const int count = static_cast<int>(params[5]);
+	if (count <= 0) {
+		data->array_data.clear();
 		return 1;
 	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
-			
-			it->second->array_data->clear();
 
-			cell* array = NULL;
-			amx_GetAddr(amx, params[3], &array);
-			for (int i = 0, j = static_cast<int>(params[5]); i != j; ++i)
-			{
-				it->second->array_data->push_back(static_cast<int>(array[i]));
-			}
-			return 1;
-		}
+	cell* array = nullptr;
+	if (amx_GetAddr(amx, params[3], &array) != AMX_ERR_NONE || array == nullptr) {
+		return 0;
 	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
-	}
-	return 0;
+
+	data->array_data.assign(array, array + count);
+	return 1;
 }
 
 //
@@ -323,64 +188,32 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_GetArrayData(AMX* amx, cell* param
 {
 	CHECK_PARAMS(5);
 
-	int	type = params[1];
-	int	textid = params[2];
-	int	playerid = params[4];
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[4]),
+		__func__);
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
-
-		int index = 0;
-		cell* array = NULL;
-		amx_GetAddr(amx, params[3], &array);
-
-		for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
-		{
-			if (index == static_cast<int>(params[5]))
-			{
-				break;
-			}
-			array[index++] = static_cast<cell>(*data);
-		}
-		return 1;
+	if (data == nullptr) {
+		return 0;
 	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
 
-			int index = 0;
-			cell* array = NULL;
-			amx_GetAddr(amx, params[3], &array);
+	const int capacity = static_cast<int>(params[5]);
+	if (capacity <= 0) {
+		return 0;
+	}
 
-			for (std::vector<int>::const_iterator data = it->second->array_data->begin(); data != it->second->array_data->end(); ++data)
-			{
-				if (index == static_cast<int>(params[5]))
-				{
-					break;
-				}
-				array[index++] = static_cast<cell>(*data);
-			}
-			return 1;
-		}
+	cell* array = nullptr;
+	if (amx_GetAddr(amx, params[3], &array) != AMX_ERR_NONE || array == nullptr) {
+		return 0;
 	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
+
+	const size_t limit = (std::min)(static_cast<size_t>(capacity), data->array_data.size());
+	for (size_t i = 0; i < limit; ++i) {
+		array[i] = static_cast<cell>(data->array_data[i]);
 	}
-	return 0;
+
+	return 1;
 }
 
 //
@@ -390,44 +223,16 @@ cell AMX_NATIVE_CALL Natives::DynamicTextDraw_ClearArrayData(AMX* amx, cell* par
 {
 	CHECK_PARAMS(3);
 
-	int	type = params[1];
-	int	textid = params[2];
-	int	playerid = params[3];
+	Text_Data* data = resolve(
+		static_cast<int>(params[1]),
+		static_cast<int>(params[2]),
+		static_cast<int>(params[3]),
+		__func__);
 
-	if (type == TDStreamer_Type::GLOBAL)
-	{
-		auto it = GlobalText::gText->find(textid);
-		if (it == GlobalText::gText->end())
-		{
-			Plugin_Settings::ILogger(LogType::FIND_GLOBAL_TEXT, __func__, INVALID_PLAYER_ID, textid);
-			return 0;
-		}
+	if (data == nullptr) {
+		return 0;
+	}
 
-		delete it->second->array_data;
-		std::vector<int>* arr = new std::vector<int>();
-		it->second->array_data = arr;
-		return 1;
-	}
-	else if (type == TDStreamer_Type::PLAYER)
-	{
-		if (playerid >= 0 && playerid < MAX_PLAYERS)
-		{
-			auto it = PlayerText::pText[playerid]->find(textid);
-			if (it == PlayerText::pText[playerid]->end())
-			{
-				Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
-				return 0;
-			}
-
-			delete it->second->array_data;
-			std::vector<int>* arr = new std::vector<int>();
-			it->second->array_data = arr;
-			return 1;
-		}
-	}
-	else
-	{
-		Plugin_Settings::ILogger(LogType::INVALID_TYPE, __func__, INVALID_PLAYER_ID, INVALID_PLAYER_ID);
-	}
-	return 0;
+	data->array_data.clear();
+	return 1;
 }

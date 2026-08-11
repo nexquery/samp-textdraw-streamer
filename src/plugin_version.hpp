@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-#define		MINOR		(2)
-#define		MAJOR		(0)
-#define		PATCH		(4)
+// The original header mislabeled these: MINOR held the major version (2) and
+// MAJOR held the minor (0), which printed correctly by luck.
+#define		VERSION_MAJOR	(2)
+#define		VERSION_MINOR	(0)
+#define		VERSION_PATCH	(5)
