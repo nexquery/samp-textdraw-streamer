@@ -29,6 +29,11 @@ cell AMX_NATIVE_CALL Natives::CreateDynamicPlayerTextDraw(AMX* amx, cell* params
 
 	if (playerid >= 0 && playerid < MAX_PLAYERS)
 	{
+		// Auto-register player jika belum di OnPlayerConnect
+		if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
+			GlobalText::PlayerList.insert(playerid);
+		}
+
 		// Daha onceden verileri depolamak icin pointer olusturuldu mu kontrol et
 		if (PlayerText::pText[playerid] == nullptr)
 		{
@@ -103,19 +108,19 @@ cell AMX_NATIVE_CALL Natives::DestroyDynamicPlayerTextDraw(AMX* amx, cell* param
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -149,19 +154,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawLetterSize(AMX* amx, cell* pa
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -193,19 +198,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawTextSize(AMX* amx, cell* para
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -234,19 +239,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawAlignment(AMX* amx, cell* par
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -274,19 +279,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawColour(AMX* amx, cell* params
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -314,19 +319,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawUseBox(AMX* amx, cell* params
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -354,19 +359,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawBoxColor(AMX* amx, cell* para
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -394,19 +399,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetShadow(AMX* amx, cell* par
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -434,19 +439,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetOutline(AMX* amx, cell* pa
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -474,19 +479,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawBackgroundColour(AMX* amx, ce
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -514,19 +519,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawFont(AMX* amx, cell* params)
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -554,19 +559,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetProportional(AMX* amx, cel
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -594,19 +599,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetSelectable(AMX* amx, cell*
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -633,19 +638,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawShow(AMX* amx, cell* params)
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -748,19 +753,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawHide(AMX* amx, cell* params)
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -782,19 +787,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetString(AMX* amx, cell* par
 		textid = static_cast<int>(params[2]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -822,19 +827,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewModel(AMX* amx, cel
 	Plugin_Settings::line = static_cast<int>(params[5]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -868,19 +873,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewRot(AMX* amx, cell*
 	Plugin_Settings::line = static_cast<int>(params[8]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -912,19 +917,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPreviewVehicleColours(AMX*
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -950,7 +955,7 @@ cell AMX_NATIVE_CALL Natives::IsValidDynamicPlayerTextDraw(AMX* amx, cell* param
 		textid = static_cast<int>(params[2]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr) {
@@ -979,19 +984,19 @@ cell AMX_NATIVE_CALL Natives::IsDynamicPlayerTextDrawVisible(AMX* amx, cell* par
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1010,19 +1015,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetString(AMX* amx, cell* par
 		textid = static_cast<int>(params[2]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1049,19 +1054,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawSetPos(AMX* amx, cell* params
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1091,19 +1096,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetLetterSize(AMX* amx, cell*
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1127,19 +1132,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetTextSize(AMX* amx, cell* p
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1163,19 +1168,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPos(AMX* amx, cell* params
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1199,19 +1204,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetColour(AMX* amx, cell* par
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1232,19 +1237,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetBoxColour(AMX* amx, cell* 
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1265,19 +1270,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetBackgroundColour(AMX* amx,
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1298,19 +1303,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetShadow(AMX* amx, cell* par
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1331,19 +1336,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetOutline(AMX* amx, cell* pa
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1364,19 +1369,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetFont(AMX* amx, cell* param
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1397,19 +1402,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsBox(AMX* amx, cell* params)
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1430,19 +1435,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsProportional(AMX* amx, cell
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1463,19 +1468,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawIsSelectable(AMX* amx, cell* 
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1496,19 +1501,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetAlignment(AMX* amx, cell* 
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1529,19 +1534,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewModel(AMX* amx, cel
 	Plugin_Settings::line = static_cast<int>(params[4]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1562,19 +1567,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewRot(AMX* amx, cell*
 	Plugin_Settings::line = static_cast<int>(params[8]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1600,19 +1605,19 @@ cell AMX_NATIVE_CALL Natives::DynamicPlayerTextDrawGetPreviewVehicleColours(AMX*
 	Plugin_Settings::line = static_cast<int>(params[6]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1638,19 +1643,19 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetRealID(AMX* amx, cell* params)
 	service::setInt(amx, params[3], INVALID_DYNAMIC_PLAYER_TEXTDRAW);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)
 	{
-		Plugin_Settings::ILogger(LogType::CREATE_PLAYER_TEXTDRAW, __func__, playerid, textid);
+		// silent: pText null — jangan spam log
 		return 0;
 	}
 
 	auto it = PlayerText::pText[playerid]->find(textid);
 	if (it == PlayerText::pText[playerid]->end())
 	{
-		Plugin_Settings::ILogger(LogType::FIND_PLAYER_TEXT, __func__, playerid, textid);
+		// silent: textid tidak ditemukan (invalid/0/65535) — jangan spam log
 		return 0;
 	}
 
@@ -1666,7 +1671,7 @@ cell AMX_NATIVE_CALL Natives::PlayerTextDrawGetSize(AMX* amx, cell* params)
 	int playerid = static_cast<int>(params[1]);
 
 	if (GlobalText::PlayerList.find(playerid) == GlobalText::PlayerList.end()) {
-		return 0;
+		GlobalText::PlayerList.insert(playerid);
 	}
 
 	if (PlayerText::pText[playerid] == nullptr)

@@ -825,7 +825,7 @@ inline const char *GetVersionString() {
 #define INVALID_OBJECT_ID (0xFFFF)
 #define MAX_GANG_ZONES (1024)
 #define MAX_TEXT_DRAWS (2048)
-#define MAX_PLAYER_TEXT_DRAWS (256)
+#define MAX_PLAYER_TEXT_DRAWS (1024)
 #define MAX_MENUS (128)
 #define MAX_3DTEXT_GLOBAL (1024)
 #define MAX_3DTEXT_PLAYER (1024)
